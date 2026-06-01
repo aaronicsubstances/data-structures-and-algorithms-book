@@ -1,4 +1,4 @@
-const { newList, isEmpty, size, print } = require("../lists/linkedList");
+const { newList, isEmpty, size, print } = require("../10 lists/linkedList");
 
 const add = (list, valueToAdd) => {
   if (isEmpty(list) || valueToAdd < list.value) {
@@ -41,3 +41,26 @@ module.exports = {
   remove,
   size
 };
+
+let demo = newList();
+demo = add(demo, 9);
+demo = add(demo, 12);
+demo = add(demo, 4);
+demo = add(demo, 60);
+demo = add(demo, 22);
+demo = add(demo, 56);
+
+console.log(find(demo, 1)); // false
+console.log(find(demo, 4)); // true
+console.log(find(demo, 22)); // true
+console.log(find(demo, 61)); // false
+
+console.log("after removing...");
+
+demo = remove(demo, 4);
+demo = remove(demo, 22);
+
+console.log(find(demo, 1)); // false
+console.log(find(demo, 4)); // false
+console.log(find(demo, 22)); // false
+console.log(find(demo, 61)); // false

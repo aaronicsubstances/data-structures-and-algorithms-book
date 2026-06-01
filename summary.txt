@@ -1,0 +1,40 @@
+/**** CHAPTER 6 *****/
+
+// SUMMARY: most important algorithms: insertion sort, merge sort, quick sort, counting sort.
+// - adaptability and online/offline aspects of sorting
+// - realization that popular programming languages do not use any of these, except as subroutines,
+// but rather use more complex algorithms, to achieve adaptability and stability simultaneously.
+
+/**** CHAPTER 7 *****/
+
+// SUMMARY: goal is to use sorting algorithms with modification to get running time of O(n).
+// To achieve this, either use sorting algorithms which already has running time of O(n), 
+// Or modify quick sort to perform partition which guarantees no empty partition.
+// And then there is an extra algorithm not based on sorting, which is for finding median itself,
+// ie centre of sorted array.
+
+/** CHAPTER 8 **/
+
+// SUMMARY: fisher-yates algorithms for shuffling and sampling, ordered sampling, reservoir sampling algorithm
+
+/** CHAPTER 9 **/
+
+// SUMMARY: linear search algorithm, binary search algorithm, exponential search algorithm, interpolation algorithm
+
+/** CHAPTER 10 **/
+// Array list and linked list
+
+Array list: enough for generic list. achieves superior time performance of O(1) due to amortisation 
+of add/remove operations which once in a while require allocating existing array to another
+memory location with double or half the capacity.
+
+Linked list: superior memory management, but O(n) for operations make it inferior for use
+as a random access generic list.
+singly-linked: enough for stacks and queues
+doubly-linked: used for deques and circular lists
+
+/** CHAPTER 11 **/
+Linked list, sorted: used for bags/multisets and sets with comparable elements
+skip lists: best possible use of lists for implementing maps, if not
+using hashing or binary trees
+Hashtables: better performance for maps and sets

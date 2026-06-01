@@ -11,7 +11,7 @@ const combSort = (arr, from = 0, to = arr.length - 1) => {
     }
     for (let i = from; i <= to - gap; i++) {
       if (arr[i] > arr[i + gap]) {
-        [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
+        [arr[i], arr[i + gap]] = [arr[i + gap], arr[i]];
       }
     }
   }

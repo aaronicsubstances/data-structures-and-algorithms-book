@@ -11,12 +11,12 @@ class Queue {
     console.log(this._values);
   }
 
-  push(value) {
+  enter(value) {
     this._values.unshift(value);
     return this; // chaining
   }
 
-  pop() {
+  exit() {
     if (this.isEmpty()) {
       throw new Error("Empty queue - cannot pop");
     } else {

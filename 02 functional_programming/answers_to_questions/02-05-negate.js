@@ -1,5 +1,11 @@
 const negate = (fn) => (...args) => !fn(...args);
 
+module.exports = {
+  negate
+};
+
+if (require.main !== module) return;
+
 const isAdult = (x) => x >= 21;
 
 console.log(isAdult(22));

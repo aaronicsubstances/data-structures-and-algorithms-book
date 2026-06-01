@@ -27,6 +27,8 @@ const lazySelectMedian = (arr, left = 0, right = arr.length - 1) => {
   } while (dSize > len / 2 || uSize > len / 2 || m.length > 4 * sR);
 
   sort(m);
+  // NB: when len is even, higher index is chosen instead of lower index
+	// contrary to what the book indicated. use of (len - 1)/2 would have chosen lower index.
   return m[Math.floor(len / 2) - dSize];
 };
 

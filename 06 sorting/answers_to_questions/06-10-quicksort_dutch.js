@@ -41,5 +41,48 @@ const quickSort = (arr, left = 0, right = arr.length - 1) => {
   return arr;
 };
 
+const quickSortAlt = (arr, from = 0, to = arr.length - 1) => {
+  if (from >= to) return arr;
+	
+	const iPivot = Math.floor(from + (to - from + 1) * Math.random());
+	
+	if (iPivot !== from) {
+		[arr[iPivot], arr[from]] = [arr[from], arr[iPivot]];
+	}
+
+	const pivot = arr[from];
+    
+    let lt = from,
+		gt = to
+        j = from + 1;
+		
+    // Loop invariants:
+    // 1. arr[from] ... arr[lt-1] are less than pivot
+    // 2. arr[lt] ... arr[j-1] are equal to pivot
+    // 3. arr[gt+1] ... arr[to] are greater than pivot
+    // 4. arr[j] ... arr[gt] have not yet been examined
+
+    while (j <= gt) {
+      if (arr[j] < pivot) {
+        [arr[j], arr[lt]] = [arr[lt], arr[j]];
+        lt++;
+        j++;
+      }
+      else if (arr[j] > pivot) {
+        [arr[j], arr[gt]] = [arr[gt], arr[j]];
+        gt--;
+      }
+      else {
+        j++; // equal to key, do keep contiguous stretch going
+      }
+    }
+
+    quickSortAlt(arr, from, lt - 1);
+    quickSortAlt(arr, gt + 1, to);
+	
+	return arr;
+}
+
 const data = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9];
-console.log(quickSort(data));
+console.log(quickSort([...data]));
+console.log(quickSortAlt([...data]));

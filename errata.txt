@@ -1,0 +1,4 @@
+https://nostarch.com/download/DataStructuresAlgorithmsJavaScript_p1.pdf
+
+Question 4.9 - should be (2^k) - 1, not 2^(k-1), and should probably be
+described as being for the mathematically inclined as is done in Question 9.4
