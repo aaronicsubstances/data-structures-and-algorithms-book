@@ -20,6 +20,8 @@
 /** CHAPTER 9 **/
 
 // SUMMARY: linear search algorithm, binary search algorithm, exponential search algorithm, interpolation algorithm
+// NB: all these algorithms assume a list whose at() operations is O(1),
+// ie a constant-size array or an array list rather than a linked list.
 
 /** CHAPTER 10 **/
 // Array list and linked list
@@ -34,7 +36,10 @@ singly-linked: enough for stacks and queues
 doubly-linked: used for deques and circular lists
 
 /** CHAPTER 11 **/
-Linked list, sorted: used for bags/multisets and sets with comparable elements
-skip lists: best possible use of lists for implementing maps, if not
-using hashing or binary trees
-Hashtables: better performance for maps and sets
+Linked list, singly-linked, sorted: used for bags/multisets and sets with comparable elements
+- simple implementation gives O(n) for insert, find, remove, aka dictionary operations.
+- Skip lists implementation gives O(log n) average for insert, find, remove. 
+It is intended to be a simpler implementation than hash tables or binary search trees.
+
+Hashtables: gives O(1) on average for insert, find, remove
+collision handling strategies: chaining, open addressing, double hashing.

@@ -10,6 +10,7 @@ const {
 let sl = newSkipList();
 console.log("EMPTY");
 console.log(sl);
+print(sl);
 console.log(isEmpty(sl));
 
 sl = add(sl, 22);
