@@ -7,15 +7,17 @@ const newSkipList = () => ({
 
 const isEmpty = (sl) => sl.next[0].next[0] === null;
 
-const print = (node) => {
-  /*for (let i = 0; i < node.next.length; i++) {
+const print2 = (node) => {
+  for (let i = 0; i < node.next.length; i++) {
     const levelItems = [];
     for (let ptr = node; ptr !== null; ptr = ptr.next[i]) {
       levelItems.push(`${ptr.value}`);
     }
     console.log(`${i}: ${levelItems}`);
   }
-  return;*/
+}
+
+const print = (node) => {
   if (node) {
     console.log(
       node.value,
@@ -77,12 +79,14 @@ const add = (sl, valueToAdd) => {
   _add(sl, currLevel, newNode, newLevel);
   return sl;*/
   
-  // to avoid need for inner while loop above,
-  // always ensure the list at the topmost level is the empty list,
+  // To avoid need for inner while loop above,
+  // one could store the end sentinel separately as a property
+  // besides the 'next' property of the start sentinel.
+  //
+  // The book decided on an alternative approach, of
+  // always ensuring that the list at the topmost level is the empty list,
   // such that the number of levels of a non-empty skip list is always at least 1,
-  // and the end sentinels point to the same reference.
-  // By so doing adding new levels or removing empty levels can be done in
-  // constant time.
+  // and that the end sentinels point to the same reference.
 
   while (newLevel >= currLevel) {
 
@@ -154,5 +158,6 @@ module.exports = {
   add,
   find,
   print,
+  print2,
   remove
 };
