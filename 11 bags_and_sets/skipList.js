@@ -72,8 +72,9 @@ const add = (sl, valueToAdd) => {
     while (ptr.next[currLevel] !== null) {
       ptr = ptr.next[currLevel];
     }
-    ptr.next.push(null);
-    sl.next.push(ptr);
+    const endSentinel = ptr;
+    endSentinel.next.push(null);
+    sl.next.push(endSentinel);
     currLevel++;
   }
   _add(sl, currLevel, newNode, newLevel);
@@ -96,9 +97,9 @@ const add = (sl, valueToAdd) => {
     // for an empty skip list;
     // and in which the number of nulls in the 'next' property of the sole item in the
     // repeated reference equals the currLevel + 1.
-    const ptr = sl.next[currLevel];
-    ptr.next.push(null);
-    sl.next.push(ptr);
+    const endSentinel = sl.next[currLevel];
+    endSentinel.next.push(null);
+    sl.next.push(endSentinel);
     currLevel++;
   }
   _add(sl, currLevel, newNode, newLevel);
@@ -146,7 +147,8 @@ const remove = (sl, valueToRemove) => {
 
     level--
   ) {
-    sl.next[level].next.splice(level, 1);
+    const endSentinel = sl.next[level];
+    endSentinel.next.splice(level, 1);
     sl.next.splice(level, 1);
   }
   return sl;

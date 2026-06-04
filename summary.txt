@@ -26,12 +26,16 @@
 /** CHAPTER 10 **/
 // Array list and linked list
 
-Array list: enough for generic list. achieves superior time performance of O(1) due to amortisation 
-of add/remove operations which once in a while require allocating existing array to another
-memory location with double or half the capacity.
+Array list: enough for generic list. maintains best performance of O(1) random access of
+constant-size arrays. achieves superior time performance of O(1)  
+of add/remove operations due to amortisation, which once in a while 
+require allocating existing array to another memory location with double or
+half the capacity respectively.
 
-Linked list: superior memory management, but O(n) for operations make it inferior for use
-as a random access generic list.
+Linked list: superior memory management. unsorted version gives O(n) for
+random access operations and dictionary operations of insert, find, remove. and so
+unsuitable for generic list, but very suitable for specialized data structures or
+as a component of other data structures.
 singly-linked: enough for stacks and queues
 doubly-linked: used for deques and circular lists
 
@@ -41,5 +45,9 @@ Linked list, singly-linked, sorted: used for bags/multisets and sets with compar
 - Skip lists implementation gives O(log n) average for insert, find, remove. 
 It is intended to be a simpler implementation than hash tables or binary search trees.
 
-Hashtables: gives O(1) on average for insert, find, remove
+Hashtables: used for bags/multisets and sets and does not require elements to be
+comparable, unlike skip lists and binary search trees.
+also it gives O(1) on average for insert, find, remove, unlike skip lists and binary 
+search trees which give O(log n) on average.
 collision handling strategies: chaining, open addressing, double hashing.
+main disadvantage is that it does not maintain any ordering of elements.
