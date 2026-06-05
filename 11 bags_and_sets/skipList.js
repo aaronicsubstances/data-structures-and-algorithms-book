@@ -140,10 +140,11 @@ const remove = (sl, valueToRemove) => {
   for (
     let level = _level(sl) - 1;
     
-    // no need for level > 0, else two empty lists will remain, 
+    // no need for ending loop at level = 1 rather than level = 0,
+    // else two empty lists will remain, 
     // which is not a serious bug, but doesn't correspond nicely to 
     // skip list clearing bringing it to a state like the state of its creation.
-    /*level > 0 &&*/ sl.next[level].next[level] === null;
+    level >= 0 && sl.next[level].next[level] === null;
 
     level--
   ) {
