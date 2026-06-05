@@ -53,7 +53,7 @@ const _add = (currNode, currLevel, newNode, newLevel, prevNodesInfo = null) => {
     // was entered.
     if ((currLevel + 1) >= prevNodesInfo.length // meaning _add is being 
                                                 // called for the first time
-       ||prevNodesInfo[currLevel + 1].node !== currNode) {
+       || prevNodesInfo[currLevel + 1].node !== currNode) {
 
       // At any level, if a link goes from node A to node B, the relIndex
       // (called "width" in book) of the
@@ -86,10 +86,6 @@ const _add2 = (sl, currLevel, newNode, newLevel) => {
     .fill(0)
     .map(() => ({ node: null, absIndex: 0 }));
   _add(sl, currLevel, newNode, newLevel, prevNodesInfo);
-  /*console.log("PREV NODES INFO:");
-  prevNodesInfo.forEach((x, i) => {
-    console.log(`${i}: ${x.node.value} = ${x.absIndex}`)
-  });*/
 
   // absolute indices are 0-based relative to start sentinel,
   // and are equivalent to 1-based indices when counting non-sentinel
@@ -123,9 +119,13 @@ const _add2 = (sl, currLevel, newNode, newLevel) => {
     newNode.relIndex[level] = absNewNodeIndex - prevNodesInfo[level].absIndex;
 
     // after getting index of new node relative to prev node at some level,
-    // use it to adjust index of next node relative to new node through the
+    // ie prev-to-new,
+    // use it to adjust index of next node relative to new node,
+    // ie new-to-next,
+    // through the
     // equation: prev-to-new + new-to-next = prev-to-next + 1,
-    // where "plus 1" accounts for the addition of new node.
+    // where prev-to-next is the existing value,
+    // and the "plus 1" accounts for the addition of new node.
     const nextNode = newNode.next[level];
     if (nextNode.next[level] !== null) {
       nextNode.relIndex[level] += 1 - newNode.relIndex[level];
@@ -166,7 +166,7 @@ const add = (sl, valueToAdd) => {
   //
   // The book decided on an alternative approach, of
   // always ensuring that the list at the topmost level is the empty list,
-  // such that the number of levels of a non-empty skip list is always at least 1,
+  // such that the number of levels of a non-empty skip list is always at least 2,
   // and that the end sentinels point to the same reference.
 
   while (newLevel >= currLevel) {
@@ -200,7 +200,7 @@ const _remove = (currNode, currLevel, valueToRemove, processingState = null) => 
       // adjust if not the end sentinel.
       if (currNode.next[currLevel].next[currLevel] !== null) {
         // refer to _add2 for equation based on which this adjustment is made.
-        currNode.next[currLevel].relIndex[currLevel] -= nextNode.relIndex[currLevel] - 1;
+        currNode.next[currLevel].relIndex[currLevel] += nextNode.relIndex[currLevel] - 1;
       }
     }
     else {
@@ -252,6 +252,30 @@ const remove = (sl, valueToRemove) => {
   return sl;
 };
 
+// adapted and modified from https://en.wikipedia.org/wiki/Skip_list
+// section "Indexable skiplist"
+const at = (sl, i) => {
+  if (i < 0) return;
+  let node = sl;
+  i++; // don't count the head/start sentinel as a step
+  for (let level = _level(sl); level >= 0; level--) {
+    // while loop invariant: node has already been used in previous higher level,
+    // or is not needed (like start sentinel)
+    while (node.next[level].next[level] !== null // ie next node is not end sentinel
+        && i >= node.next[level].relIndex[level]) { // if next step is not too far
+      node = node.next[level];    // traverse forward at the current level
+      i -= node.relIndex[level];  // subtract the relIndex (called "width"
+                                  // in Wikipedia pseudocode) of the 
+                                  // just made current node.
+    }
+    if (!i) break; // early exit, although algorithm is correct without it
+  }
+  if (!i) { // a positive i at this stage means function received
+            // invalid index from the start which is beyond bounds of skip list
+    return node.value;
+  }
+};
+
 let sl = newSkipList();
 console.log("EMPTY");
 console.log(sl);
@@ -290,6 +314,16 @@ print2(sl);
 console.log("----------");
 // console.log(sl);
 
+console.log("sl[0] =", at(sl, 0));
+console.log("sl[1] =", at(sl, 1));
+console.log("sl[2] =", at(sl, 2));
+console.log("sl[3] =", at(sl, 3));
+console.log("sl[4] =", at(sl, 4));
+console.log("sl[5] =", at(sl, 5));
+console.log("sl[6] =", at(sl, 6));
+console.log("sl[7] =", at(sl, 7));
+
+
 sl = remove(sl, 12);
 console.log("AFTER REMOVE 12");
 console.log("----------");
@@ -307,6 +341,11 @@ console.log("AFTER REMOVE 22");
 console.log("----------");
 print2(sl);
 console.log("----------");
+
+console.log("sl[0] =", at(sl, 0));
+console.log("sl[1] =", at(sl, 1));
+console.log("sl[2] =", at(sl, 2));
+console.log("sl[3] =", at(sl, 3));
 
 sl = remove(sl, 4);
 console.log("AFTER REMOVE 4");
@@ -332,6 +371,19 @@ console.log("----------");
 print2(sl);
 console.log("----------");
 
+
+console.log("sl[0] =", at(sl, 0));
+console.log("sl[1] =", at(sl, 1));
+console.log("sl[2] =", at(sl, 2));
+console.log("sl[3] =", at(sl, 3));
+
+console.log("----------");
+sl = add(sl, 4);
+console.log("AFTER ADD 4");
+console.log("----------");
+print2(sl);
+console.log("----------");
+
 sl = remove(sl, 56);
 console.log("AFTER REMOVE 56");
 console.log("----------");
@@ -343,3 +395,67 @@ console.log("AFTER REMOVE 9");
 console.log("----------");
 print2(sl);
 console.log("----------");
+
+sl = remove(sl, 4);
+console.log("AFTER REMOVE 4");
+console.log("----------");
+print2(sl);
+console.log("----------");
+
+(function() {
+  const confirmEquality = (expected, actual, iterCount) => {
+    for (let i = 0; i < expected.length + 100; i++) {
+      const e = expected[i];
+      const a = at(actual, i);
+      if (e !== a) {
+        console.log("EXPECTED:");
+        console.log(expected);
+        console.log("ACTUAL:");
+        console.log("----------");
+        print2(actual);
+        console.log("----------");
+        throw new Error(`iteration ${iterCount}, at ${i}: ${a} !== ${e}`)
+      }
+    }
+  };
+  const buffer = [];
+  for (let i = 0; i < 100; i++) {
+    buffer.push(i);
+  }
+  for (let i = 0; i < 100; i++) {
+    const expected = [];
+    let actual = newSkipList();
+    const duplicateBuffer = [...buffer];
+    for (let j = 0; j < 50; j++) {
+      const randIdx = Math.floor(Math.random() * duplicateBuffer.length);
+      const randItem = duplicateBuffer[randIdx];
+      duplicateBuffer.splice(randIdx, 1);
+      expected.push(randItem);
+      actual = add(actual, randItem);
+    }
+    expected.sort((a, b) => a - b);
+    confirmEquality(expected, actual, i+1);
+    for (let j = 0; j < 50; j++) {
+      if (Math.random() > 0.3) {
+        if (!expected.length) continue;
+        const randIdx = Math.floor(Math.random() * expected.length);
+        const randItem = expected[randIdx];
+        expected.splice(randIdx, 1);
+        actual = remove(actual, randItem);
+      }
+      else {
+        if (!duplicateBuffer.length) continue;
+        const randIdx = Math.floor(Math.random() * duplicateBuffer.length);
+        const randItem = duplicateBuffer[randIdx];
+        duplicateBuffer.splice(randIdx, 1);
+        expected.push(randItem);
+        expected.sort((a, b) => a - b);
+        actual = add(actual, randItem);
+      }
+
+      confirmEquality(expected, actual, i+1);
+    }
+  }
+
+  console.log("all random tests passed");
+})();

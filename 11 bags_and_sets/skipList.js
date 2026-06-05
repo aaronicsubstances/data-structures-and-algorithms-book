@@ -86,7 +86,7 @@ const add = (sl, valueToAdd) => {
   //
   // The book decided on an alternative approach, of
   // always ensuring that the list at the topmost level is the empty list,
-  // such that the number of levels of a non-empty skip list is always at least 1,
+  // such that the number of levels of a non-empty skip list is always at least 2,
   // and that the end sentinels point to the same reference.
 
   while (newLevel >= currLevel) {
