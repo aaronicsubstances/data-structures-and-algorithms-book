@@ -2,3 +2,8 @@ https://nostarch.com/download/DataStructuresAlgorithmsJavaScript_p1.pdf
 
 Question 4.9 - should be (2^k) - 1, not 2^(k-1), and should probably be
 described as being for the mathematically inclined as is done in Question 9.4
+
+Question 5.11 - width link pointing to 11 should be (3) not (2).
+And there should be a note that the start sentinel
+also has a width of 1, and it should be shown in the diagram as the node
+storing the width link pointing to 11.
