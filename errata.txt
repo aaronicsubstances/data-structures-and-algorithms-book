@@ -7,3 +7,5 @@ Question 5.11 - width link pointing to 11 should be (3) not (2).
 And there should be a note that the start sentinel
 also has a width of 1, and it should be shown in the diagram as the node
 storing the width link pointing to 11.
+
+Figure 12.45 - parent of 12 should be 23, not 9
