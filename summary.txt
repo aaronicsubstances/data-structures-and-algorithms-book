@@ -51,3 +51,81 @@ also it gives O(1) on average for insert, find, remove, unlike skip lists and bi
 search trees which give O(log n) on average.
 collision handling strategies: chaining, open addressing, double hashing.
 main disadvantage is that it does not maintain any ordering of elements.
+
+/** CHAPTER 12 **/
+Binary search tree, aks BST: it's all about maintaining the invariant that 
+the keys of all nodes in the left child are less than the parent key,
+and the keys of all nodes in the right child are greater than the parent key.
+To support duplicate keys, less than can be changed to less than or greater than.
+Operation of remove is the same for all balanced BST variants when
+the number of children of the node to be removed is less than 2, because in that
+case an adoption occurs.
+when removing the key of a node with two non-empty children,
+pick math successor of key, ie the minimum key greater than key, from 
+leftmost branch of the right, and set it to the key. You can remove that
+node before or after setting its key to the place of the node whose key is to 
+be removed.
+
+Balancing search trees: it is all about rotations. In a rotation of one child of a
+tree to the other side, i.e. either rotating a left child rightwards, or rotating a 
+right child leftwards, the old root is demoted and the rotated child becomes the new root,
+but the algorithm compensates the old root for the demotion by transfering to it 
+a specific child of the new root, i.e. rotating a left child causes it to lose its
+right child to the old root, who adopts it as its left child. Similarly rotating a right
+child causes it to lose its left child to the old root, who adopts it as its right child.
+
+AVL tree - height-balanced BST: all about fixing balances of BST after updates,
+ie add and remove. Requires to store height information in nodes to calculate balances,
+because balance calculations assume that height information of children are correct.
+    where balance = heights of right child - height of left child
+    and abs (balance of node) <= 1
+    if balance of node < -1, then we have to rotate left child to the right,
+    but before that, check if its right child, ie a grandchild of node, is on the verge
+    of imbalance on its right, ie its balance is 1, and if so rotate that
+    node's grandchild to the left first,
+    before rotating that node's left child to the right.
+    if balance of node > 1, then we have to rotate right child to the left,
+    but before that, check if its left child, ie a grandchild of node, is on the verge
+    of imbalance on its left, ie its balance is -1, and if so rotate that
+    node's grandchild to the right first,
+    before rotating that node's right child to the left.
+
+Weight-Balance Bounded Tree: very similar to AVL, and so all it's
+about fixing balances of BST after updates. Requires to store size information
+in nodes to calculate balances,
+because balance calculations assume that size information of children are correct.
+Storing size information has beneficial side effect of making it possible to find a
+key by position or rank.
+    where balance of non-root node is = (size of node + 1)/ (size of parent + 1)
+    and balance of child node <= BETA
+        (at the exact same place in AVL that checks that abs(node balance) > 1)
+    and balance of left-right or right-left grand child node <= DELTA
+        (at exact same place in AVL that checks if an extra rotation is needed)
+    and 0 < ALPHA < 0.5 theoretically, but in practice 2/11 <= ALPHA <= 1 - (sqrt(2)/2)
+    and BETA = 1 - ALPHA, GAMMA = ALPHA/BETA, DELTA = 1 - GAMMA
+
+Randomized BST: all about splitting node sometimes during addition.
+Requires to store size information in nodes to calculate probabilities
+of node splitting during addition, and also for joining node children
+during removal of a node with two non-empty children.
+This is addition performs split with a probability of 
+1/size of node, and joining selects a child node as root of join with probability of
+size of child/size of parent. 
+Storing size information has beneficial side effect of making it possible to find a
+key by position or rank.
+The tricky part is with splitting a node: that the left subtree is built by 
+inserting into its right child, and never into its left child.
+Similarly right subtree is built by inserting into its left child,
+and never into its right child.
+
+Splay Tree: all about splaying at the beginning of add, remove and even find as well.
+splayMinimum used in remove for a node with two non-empty children,
+is a special case of splaying when negative Infinity is passed as keyToUp parameter.
+Splay operation is almost same as for AVL/BB rotations, but with different names:
+zig - left rotation;
+zag - right rotation.
+zag-zig - right left rotation;
+zig-zag - left right rotation
+The new splay operation are zig-zig and zag-zag
+zig-zig - left rotation of parent, followed by left rotation of node
+zag-zag - right rotation of parent, followed by right rotation of node
