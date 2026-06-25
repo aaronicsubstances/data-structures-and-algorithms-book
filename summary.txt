@@ -129,3 +129,42 @@ zig-zag - left right rotation
 The new splay operation are zig-zig and zag-zag
 zig-zig - left rotation of parent, followed by left rotation of node
 zag-zag - right rotation of parent, followed by right rotation of node
+
+Chapter 13
+
+B-tree of order 3 and Red-Black Left Leaning 2-3 tree (invented by Robert Sedgewick)
+are equivalent.
+The simplicity of the former helps to understand the complex code of the latter.
+
+During the algorithms for addition and deletion of red-black trees, the operation of
+flipping colours is equivalent to the operation of merging or splitting nodes in
+the algorithms for addition and deletion of b-trees.
+also non-existent nodes of red-black trees are considered to be black just like leaves
+and the root.
+
+One property I noticed is that in this left Leaning variant of 2-3 red-black tree,
+no red node can have exactly 1 child: it must have either zero or 2 children. This
+helped me to debug my simulations.
+
+The book talks about thinking in terms of coloured links. I only found it helpful,
+when I looked at videos by Sedgewick. So I would have loved a clarification
+that, the colour of a link is determined by the node
+the link is coming down to, and not by the node the link is going up to.
+At the beginning of the red-black tree section that was not clear to me. 
+
+I realized that in the Java code by Sedgewick, the _fixUp routine has an additional
+condition for its first if statement, such that it only rotates the left red link
+rightwards if the right link isn't red. That additional condition is missing in the
+JS code. I presume the omission is justified because if a tree's left and right links 
+are all red, even if the JS code initially rotates it to the right, the next if
+statement will rotate it back to the left to restore it to the equivalent
+in the Java code, which would have skipped the two if statements.
+
+I also realized that in the Java code by Sedgewick, the remove routine has a 
+beginning if statement which sets the color of the root to red if its children are
+all black prior to entering the _remove routine. That statement is omitted in
+the JS code. That statement kind of helped me understand the invariant of
+being positioned at a red node prior to the start of any call to the _remove
+routine. I presume that the omission is justified because
+the _remove routine never examines the colour of the tree parameter itself.
+Rather it only examines the colours of the tree's descendants.
