@@ -414,6 +414,50 @@ RedBlack.prototype.insertElement = function(insertedValue)
 	return this.commands;
 }
 
+RedBlack.prototype.fixUp = function(tree)
+{
+	if (!this.blackLevel(tree.right) && this.blackLevel(tree.left)) {
+		this.cmd("SetText", 0, "Only right child of node is red -- rotate");
+		this.cmd("Step");
+
+		tree = this.singleRotateLeft(tree);
+	}
+	if (!this.blackLevel(tree.left) && !this.blackLevel(tree.left.left)) {
+		this.cmd("SetText", 0, "Double red found in left child and left-left grandchild -- rotate");
+		this.cmd("Step");
+
+		tree = this.singleRotateRight(tree);
+	}
+	if (!this.blackLevel(tree.left) && !this.blackLevel(tree.right)) {
+		this.cmd("SetText", 0, "Both children of node are red -- flip colors");
+		this.cmd("Step");
+		
+		this.flipColors(tree);
+	}
+	return tree;
+}
+
+RedBlack.prototype.flipColors = function(tree)
+{
+	tree.blackLevel = 1 - tree.blackLevel;
+	tree.left.blackLevel = 1 - tree.left.blackLevel;
+	tree.right.blackLevel = 1 - tree.right.blackLevel;
+	
+	this.cmd("SetForegroundColor", tree.graphicID,
+		tree.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
+	this.cmd("SetBackgroundColor", tree.graphicID,
+		tree.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
+		
+	this.cmd("SetForegroundColor", tree.left.graphicID,
+		tree.left.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
+	this.cmd("SetBackgroundColor", tree.left.graphicID,
+		tree.left.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
+		
+	this.cmd("SetForegroundColor", tree.right.graphicID,
+		tree.right.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
+	this.cmd("SetBackgroundColor", tree.right.graphicID,
+		tree.right.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
+}
 
 RedBlack.prototype.singleRotateRight = function(tree)
 {
@@ -456,12 +500,26 @@ RedBlack.prototype.singleRotateRight = function(tree)
 			B.parent.right = A;
 		}
 	}
+
+	A.blackLevel = B.blackLevel;
+	B.blackLevel = 0;
+
 	A.right = B;
 	B.parent = A;
 	B.left = t2;
 	this.resetHeight(B);
 	this.resetHeight(A);
-	this.resizeTree();			
+	this.resizeTree();
+
+	this.cmd("SetForegroundColor", A.graphicID,
+		A.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
+	this.cmd("SetBackgroundColor", A.graphicID,
+		A.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
+	this.cmd("SetForegroundColor", B.graphicID,
+		B.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
+	this.cmd("SetBackgroundColor", B.graphicID,
+		B.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
+
 	return A;
 }
 
@@ -506,13 +564,26 @@ RedBlack.prototype.singleRotateLeft = function(tree)
 			A.parent.right = B;
 		}
 	}
+
+	B.blackLevel = A.blackLevel;
+	A.blackLevel = 0;
+
 	B.left = A;
 	A.parent = B;
 	A.right = t2;
 	this.resetHeight(A);
 	this.resetHeight(B);
-	
 	this.resizeTree();
+
+	this.cmd("SetForegroundColor", A.graphicID,
+		A.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
+	this.cmd("SetBackgroundColor", A.graphicID,
+		A.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
+	this.cmd("SetForegroundColor", B.graphicID,
+		B.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
+	this.cmd("SetBackgroundColor", B.graphicID,
+		B.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
+
 	return B;
 }
 
@@ -542,6 +613,21 @@ RedBlack.prototype.resetHeight = function(tree)
 
 RedBlack.prototype.insert = function(elem, tree)
 {
+	this._insert(elem, tree);
+
+	if (this.treeRoot.blackLevel == 0)
+	{
+		this.cmd("SetText", 0, "Root of the tree is red.  Color it black");
+		this.cmd("Step");
+		
+		this.treeRoot.blackLevel = 1;
+		this.cmd("SetForegroundColor", this.treeRoot.graphicID, FOREGROUND_BLACK);
+		this.cmd("SetBackgroundColor", this.treeRoot.graphicID, BACKGROUND_BLACK);
+	}
+}
+
+RedBlack.prototype._insert = function(elem, tree)
+{
 	this.cmd("SetHighlight", tree.graphicID, 1);
 	this.cmd("SetHighlight", elem.graphicID, 1);
 	
@@ -557,6 +643,7 @@ RedBlack.prototype.insert = function(elem, tree)
 	this.cmd("SetHighlight", tree.graphicID , 0);
 	this.cmd("SetHighlight", elem.graphicID, 0);
 	
+	var result;
 	if (elem.data < tree.data)
 	{
 		if (tree.left == null || tree.left.phantomLeaf)
@@ -567,7 +654,7 @@ RedBlack.prototype.insert = function(elem, tree)
 				this.cmd("Delete", tree.left.graphicID);
 			}
 			this.cmd("SetHighlight", elem.graphicID, 0);
-			tree.left=elem;
+			tree.left = elem;
 			elem.parent = tree;
 			this.cmd("Connect", tree.graphicID, elem.graphicID, LINK_COLOR);
 			
@@ -579,7 +666,7 @@ RedBlack.prototype.insert = function(elem, tree)
 			
 			this.resizeTree();
 			
-			this.fixDoubleRed(elem);
+			//this.fixDoubleRed(elem);
 			
 		}
 		else
@@ -588,8 +675,9 @@ RedBlack.prototype.insert = function(elem, tree)
 			this.cmd("Move", this.highlightID, tree.left.x, tree.left.y);
 			this.cmd("Step");
 			this.cmd("Delete", this.highlightID);
-			this.insert(elem, tree.left);
-			
+			result = this._insert(elem, tree.left);
+			tree.left = result;
+			result.parent = tree;
 		}
 	}
 	else
@@ -616,7 +704,7 @@ RedBlack.prototype.insert = function(elem, tree)
 			
 			
 			this.resizeTree();
-			this.fixDoubleRed(elem);
+			//this.fixDoubleRed(elem);
 		}
 		else
 		{
@@ -624,119 +712,15 @@ RedBlack.prototype.insert = function(elem, tree)
 			this.cmd("Move", this.highlightID, tree.right.x, tree.right.y);
 			this.cmd("Step");
 			this.cmd("Delete", this.highlightID);
-			this.insert(elem, tree.right);
+			result = this._insert(elem, tree.right);
+			tree.right = result;
+			result.parent = tree;
 		}
 	}
 	
-	
+	return this.fixUp(tree);
 }
 
-
-RedBlack.prototype.fixDoubleRed = function(tree)
-{
-	if (tree.parent != null)
-	{
-		if (tree.parent.blackLevel > 0)
-		{
-			return;
-		}
-		if (tree.parent.parent == null)
-		{
-			this.cmd("SetText", 0, "Tree root is red, color it black.");
-			this.cmd("Step");
-			tree.parent.blackLevel = 1;
-			this.cmd("SetForegroundColor", tree.parent.graphicID, FOREGROUND_BLACK);
-			this.cmd("SetBackgroundColor", tree.parent.graphicID, BACKGROUND_BLACK);
-			return;
-		}
-		var uncle = this.findUncle(tree);
-		if (this.blackLevel(uncle) == 0)
-		{
-			this.cmd("SetText", 0, "Node and parent are both red.  Uncle of node is red -- push blackness down from grandparent");
-			this.cmd("Step");
-			
-			this.cmd("SetForegroundColor", uncle.graphicID, FOREGROUND_BLACK);
-			this.cmd("SetBackgroundColor",uncle.graphicID, BACKGROUND_BLACK);
-			uncle.blackLevel = 1;
-			
-			tree.parent.blackLevel = 1;
-			this.cmd("SetForegroundColor", tree.parent.graphicID, FOREGROUND_BLACK);
-			this.cmd("SetBackgroundColor",tree.parent.graphicID, BACKGROUND_BLACK);
-			
-			tree.parent.parent.blackLevel = 0;
-			this.cmd("SetForegroundColor", tree.parent.parent.graphicID, FOREGROUND_RED);
-			this.cmd("SetBackgroundColor",tree.parent.parent.graphicID, BACKGROUND_RED);
-			this.cmd("Step");
-			this.fixDoubleRed(tree.parent.parent);
-		}
-		else
-		{
-			if (tree.isLeftChild() &&  !tree.parent.isLeftChild())
-			{
-				this.cmd("SetText", 0, "Node and parent are both red.  Node is left child, parent is right child -- rotate");
-				this.cmd("Step");
-				
-				this.singleRotateRight(tree.parent);
-				tree=tree.right;
-				
-			}
-			else if (!tree.isLeftChild() && tree.parent.isLeftChild())
-			{
-				this.cmd("SetText", 0, "Node and parent are both red.  Node is right child, parent is left child -- rotate");
-				this.cmd("Step");
-				
-				this.singleRotateLeft(tree.parent);
-				tree=tree.left;
-			}
-			
-			if (tree.isLeftChild())
-			{
-				this.cmd("SetText", 0, "Node and parent are both red.  Node is left child, parent is left child\nCan fix extra redness with a single rotation");
-				this.cmd("Step");
-				
-				this.singleRotateRight(tree.parent.parent);
-				tree.parent.blackLevel = 1;
-				this.cmd("SetForegroundColor", tree.parent.graphicID, FOREGROUND_BLACK);
-				this.cmd("SetBackgroundColor",tree.parent.graphicID, BACKGROUND_BLACK);
-				
-				tree.parent.right.blackLevel = 0;
-				this.cmd("SetForegroundColor", tree.parent.right.graphicID, FOREGROUND_RED);
-				this.cmd("SetBackgroundColor",tree.parent.right.graphicID, BACKGROUND_RED);						
-				
-				
-			}
-			else
-			{
-				this.cmd("SetText", 0, "Node and parent are both red.  Node is right child, parent is right child\nCan fix extra redness with a single rotation");
-				this.cmd("Step");
-				
-				this.singleRotateLeft(tree.parent.parent);
-				tree.parent.blackLevel = 1;
-				this.cmd("SetForegroundColor", tree.parent.graphicID, FOREGROUND_BLACK);
-				this.cmd("SetBackgroundColor",tree.parent.graphicID, BACKGROUND_BLACK);
-				
-				tree.parent.left.blackLevel = 0;
-				this.cmd("SetForegroundColor", tree.parent.left.graphicID, FOREGROUND_RED);
-				this.cmd("SetBackgroundColor",tree.parent.left.graphicID, BACKGROUND_RED);				
-				
-			}					
-		}
-		
-	}
-	else
-	{
-		if (tree.blackLevel == 0)
-		{
-			this.cmd("SetText", 0, "Root of the tree is red.  Color it black");
-			this.cmd("Step");
-			
-			tree.blackLevel = 1;
-			this.cmd("SetForegroundColor", tree.graphicID, FOREGROUND_BLACK);
-			this.cmd("SetBackgroundColor", tree.graphicID, BACKGROUND_BLACK);
-		}
-	}
-	
-}
 
 RedBlack.prototype.deleteElement = function(deletedValue)
 {
