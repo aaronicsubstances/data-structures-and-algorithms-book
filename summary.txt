@@ -188,7 +188,3 @@ routine. I presume that the omission is justified because
 the _remove routine never examines the colour of the tree parameter itself.
 Rather it only examines the colours of the tree's descendants.
 
-Came across https://www.cs.usfca.edu/~galles/visualization/about.html
-by one David Galles, Computer Science, University of San Francisco, which
-would have helped me understand the b-tree faster. It does not have an animation
-(yet) for left leaning red black tree.
