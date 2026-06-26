@@ -151,6 +151,25 @@ when I looked at videos by Sedgewick. So I would have loved a clarification
 that, the colour of a link is determined by the node
 the link is coming down to, and not by the node the link is going up to.
 At the beginning of the red-black tree section that was not clear to me. 
+The link colouration greatly helped me to understand the reason for the
+change of colours which occur during rotation.
+
+Sedgewick's code (https://algs4.cs.princeton.edu/33balanced/RedBlackBST.java.html)
+also made me see how to use the tree as a symbol table(aka Map in Java and JS),
+and it is simply by storing an additional 'val' field beside the 'key' field.
+It also does not use the JS code's approach of using 'side' and 'otherSide' variables
+to implement actions with 'left' and 'right' orientations in one routine,
+but rather uses two different routines. This use of two routines corresponds
+to a similar effort of mine which I employed in the previous chapter, in order to
+simulate the JS code which abstract over left and right orientations.
+Lastly the code also shows that it is possible to assign -1 to an empty tree, 
+instead of zero, so that a 1-node tree has a height of zero instead of one.
+This is actually confirmed by Wikipedia (https://en.wikipedia.org/wiki/Tree_(abstract_data_type)).
+Thus Sedgewick's code employs the common definition of height of a node,
+which counts edges of the node's path to the root, so that a 1-node tree will have
+height of zero. And that is in contrast to the other definition
+of height of a nnode which counts nodes in the node's path to the root,
+so that a 1-node tree will have height of one.
 
 I realized that in the Java code by Sedgewick, the _fixUp routine has an additional
 condition for its first if statement, such that it only rotates the left red link
@@ -168,3 +187,8 @@ being positioned at a red node prior to the start of any call to the _remove
 routine. I presume that the omission is justified because
 the _remove routine never examines the colour of the tree parameter itself.
 Rather it only examines the colours of the tree's descendants.
+
+Came across https://www.cs.usfca.edu/~galles/visualization/about.html
+by one David Galles, Computer Science, University of San Francisco, which
+would have helped me understand the b-tree faster. It does not have an animation
+(yet) for left leaning red black tree.
