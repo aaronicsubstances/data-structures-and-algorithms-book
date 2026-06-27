@@ -6,7 +6,7 @@ const {
   minKey,
   postOrder,
   preOrder
-} = require("../binary_trees/binary_search_tree.func.js");
+} = require("../12 binary_trees/binary_search_tree.js");
 
 const RED = "RED";
 const BLACK = "BLACK";

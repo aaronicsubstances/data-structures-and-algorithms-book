@@ -301,33 +301,6 @@ RedBlack.prototype.doFind = function(tree, value)
 
 
 
-
-
-RedBlack.prototype.findUncle = function(tree)
-{
-	if (tree.parent == null)
-	{
-		return null;
-	}
-	var par  = tree.parent;
-	if (par.parent == null)
-	{
-		return null;
-	}
-	var grandPar   = par.parent;
-	
-	if (grandPar.left == par)
-	{
-		return grandPar.right;
-	}
-	else
-	{
-		return grandPar.left;
-	}				
-}
-
-
-
 RedBlack.prototype.blackLevel = function(tree)
 {
 	if (tree == null)
@@ -439,24 +412,14 @@ RedBlack.prototype.fixUp = function(tree)
 
 RedBlack.prototype.flipColors = function(tree)
 {
-	tree.blackLevel = 1 - tree.blackLevel;
-	tree.left.blackLevel = 1 - tree.left.blackLevel;
-	tree.right.blackLevel = 1 - tree.right.blackLevel;
+	tree.blackLevel = tree.blackLevel ? 0 : 1;
+	tree.left.blackLevel = tree.left.blackLevel ? 0 : 1;
+	tree.right.blackLevel = tree.right.blackLevel ? 0 : 1;
 	
-	this.cmd("SetForegroundColor", tree.graphicID,
-		tree.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
-	this.cmd("SetBackgroundColor", tree.graphicID,
-		tree.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
-		
-	this.cmd("SetForegroundColor", tree.left.graphicID,
-		tree.left.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
-	this.cmd("SetBackgroundColor", tree.left.graphicID,
-		tree.left.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
-		
-	this.cmd("SetForegroundColor", tree.right.graphicID,
-		tree.right.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
-	this.cmd("SetBackgroundColor", tree.right.graphicID,
-		tree.right.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
+	this.fixNodeColor(tree);
+	this.fixNodeColor(tree.left);
+	this.fixNodeColor(tree.right);
+	this.cmd("Step");
 }
 
 RedBlack.prototype.singleRotateRight = function(tree)
@@ -511,14 +474,8 @@ RedBlack.prototype.singleRotateRight = function(tree)
 	this.resetHeight(A);
 	this.resizeTree();
 
-	this.cmd("SetForegroundColor", A.graphicID,
-		A.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
-	this.cmd("SetBackgroundColor", A.graphicID,
-		A.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
-	this.cmd("SetForegroundColor", B.graphicID,
-		B.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
-	this.cmd("SetBackgroundColor", B.graphicID,
-		B.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
+	this.fixNodeColor(A);
+	this.fixNodeColor(B);
 
 	return A;
 }
@@ -575,14 +532,8 @@ RedBlack.prototype.singleRotateLeft = function(tree)
 	this.resetHeight(B);
 	this.resizeTree();
 
-	this.cmd("SetForegroundColor", A.graphicID,
-		A.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
-	this.cmd("SetBackgroundColor", A.graphicID,
-		A.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
-	this.cmd("SetForegroundColor", B.graphicID,
-		B.blackLevel ? FOREGROUND_BLACK : FOREGROUND_RED);
-	this.cmd("SetBackgroundColor", B.graphicID,
-		B.blackLevel ? BACKGROUND_BLACK : BACKGROUND_RED);
+	this.fixNodeColor(A);
+	this.fixNodeColor(B);
 
 	return B;
 }
@@ -621,8 +572,7 @@ RedBlack.prototype.insert = function(elem, tree)
 		this.cmd("Step");
 		
 		this.treeRoot.blackLevel = 1;
-		this.cmd("SetForegroundColor", this.treeRoot.graphicID, FOREGROUND_BLACK);
-		this.cmd("SetBackgroundColor", this.treeRoot.graphicID, BACKGROUND_BLACK);
+		this.fixNodeColor(this.treeRoot);
 	}
 }
 
@@ -660,14 +610,8 @@ RedBlack.prototype._insert = function(elem, tree)
 			
 			this.attachNullLeaves(elem);
 			this.resizeTree();
-			
-			
-			
-			
+
 			this.resizeTree();
-			
-			//this.fixDoubleRed(elem);
-			
 		}
 		else
 		{
@@ -702,9 +646,7 @@ RedBlack.prototype._insert = function(elem, tree)
 			this.attachNullLeaves(elem);
 			this.resizeTree();
 			
-			
 			this.resizeTree();
-			//this.fixDoubleRed(elem);
 		}
 		else
 		{
@@ -735,442 +677,194 @@ RedBlack.prototype.deleteElement = function(deletedValue)
 	return this.commands;						
 }
 
-
-RedBlack.prototype.fixLeftNull = function(tree)
+RedBlack.prototype.treeDelete = function(tree, deletedValue)
 {
-	var treeNodeID = this.nextIndex++;
-	var nullLeaf;
-	this.cmd("SetText", 0, "Coloring 'Null Leaf' double black");
-	
-	this.cmd("CreateCircle", treeNodeID, "NULL\nLEAF",  tree.x, tree.y);
-	this.cmd("SetForegroundColor", treeNodeID, FOREGROUND_BLACK);
-	this.cmd("SetBackgroundColor", treeNodeID, BACKGROUND_DOUBLE_BLACK);
-	nullLeaf = new RedBlackNode("NULL\nLEAF", treeNodeID, tree.x, tree.x);
-	nullLeaf.blackLevel = 2;
-	nullLeaf.parent = tree;
-	nullLeaf.phantomLeaf = true;
-	tree.left = nullLeaf;
-	this.cmd("Connect", tree.graphicID, nullLeaf.graphicID, LINK_COLOR);
-	
-	this.resizeTree();				
-	this.fixExtraBlackChild(tree, true);
-	this.cmd("SetLayer", nullLeaf.graphicID, 1);
-	nullLeaf.blackLevel = 1;
-	this.fixNodeColor(nullLeaf);
-}
-
-
-RedBlack.prototype.fixRightNull = function(tree)
-{
-	var treeNodeID = this.nextIndex++;
-	var nullLeaf;
-	this.cmd("SetText", 0, "Coloring 'Null Leaf' double black");
-	
-	this.cmd("CreateCircle", treeNodeID, "NULL\nLEAF",  tree.x, tree.y);
-	this.cmd("SetForegroundColor", treeNodeID, FOREGROUND_BLACK);
-	this.cmd("SetBackgroundColor", treeNodeID, BACKGROUND_DOUBLE_BLACK);
-	nullLeaf = new RedBlackNode("NULL\nLEAF", treeNodeID, tree.x, tree.x);
-	nullLeaf.parent = tree;
-	nullLeaf.phantomLeaf = true;
-	nullLeaf.blackLevel = 2;
-	tree.right = nullLeaf;
-	this.cmd("Connect", tree.graphicID, nullLeaf.graphicID, LINK_COLOR);
-	
-	this.resizeTree();				
-	
-	this.fixExtraBlackChild(tree, false);
-	
-	this.cmd("SetLayer", nullLeaf.graphicID, 1);
-	nullLeaf.blackLevel = 1;
-	this.fixNodeColor(nullLeaf);
-	
-}
-
-
-RedBlack.prototype.fixExtraBlackChild = function(parNode, isLeftChild)
-{
-	var sibling;
-	var doubleBlackNode;
-	if (isLeftChild)
+	if (tree && this.blackLevel(tree.left) && this.blackLevel(tree.right))
 	{
-		sibling = parNode.right;
-		doubleBlackNode = parNode.left;
-	}
-	else
-	{
-		sibling = parNode.left;				
-		doubleBlackNode = parNode.right;
-	}
-	if (this.blackLevel(sibling) > 0 && this.blackLevel(sibling.left) > 0 && this.blackLevel(sibling.right) > 0)
-	{
-		this.cmd("SetText", 0, "Double black node has black sibling and 2 black nephews.  Push up black level");
+		this.cmd("SetText", 0, "Both children of root are black. Color root red");
 		this.cmd("Step");
-		sibling.blackLevel = 0;
-		this.fixNodeColor(sibling);
-		if (doubleBlackNode != null)
-		{
-			doubleBlackNode.blackLevel = 1;
-			this.fixNodeColor(doubleBlackNode);
-			
-		}
-		if (parNode.blackLevel == 0)
-		{
-			parNode.blackLevel = 1;
-			this.fixNodeColor(parNode);
-		}
-		else
-		{
-			parNode.blackLevel = 2;
-			this.fixNodeColor(parNode);
-			this.cmd("SetText", 0, "Pushing up black level created another double black node.  Repeating ...");
-			this.cmd("Step");
-			this.fixExtraBlack(parNode);
-		}				
-	}
-	else if (this.blackLevel(sibling) == 0)
-	{
-		this.cmd("SetText", 0, "Double black node has red sibling.  Rotate tree to make sibling black ...");
-		this.cmd("Step");
-		if (isLeftChild)
-		{
-			var newPar = this.singleRotateLeft(parNode);
-			newPar.blackLevel = 1;
-			this.fixNodeColor(newPar);
-			newPar.left.blackLevel = 0;
-			this.fixNodeColor(newPar.left);
-			this.cmd("Step"); // TODO:  REMOVE
-			this.fixExtraBlack(newPar.left.left);
-			
-		}
-		else
-		{
-			newPar  = this.singleRotateRight(parNode);
-			newPar.blackLevel = 1;
-			this.fixNodeColor(newPar);
-			newPar.right.blackLevel = 0;
-			this.fixNodeColor(newPar.right);
-			this.cmd("Step"); // TODO:  REMOVE
 
-			this.fixExtraBlack(newPar.right.right);
-		}
+		tree.blackLevel = 0;
+		this.fixNodeColor(tree);
 	}
-	else if (isLeftChild && this.blackLevel(sibling.right) > 0)
+
+	this._treeDelete(tree, deletedValue);
+
+	if (this.treeRoot && this.treeRoot.blackLevel == 0)
 	{
-		this.cmd("SetText", 0, "Double black node has black sibling, but double black node is a left child, \nand the right nephew is black.  Rotate tree to make opposite nephew red ...");
+		this.cmd("SetText", 0, "Root of the tree is red.  Color it black");
 		this.cmd("Step");
 		
-		var newSib = this.singleRotateRight(sibling);
-		newSib.blackLevel = 1;
-		this.fixNodeColor(newSib);
-		newSib.right.blackLevel = 0;
-		this.fixNodeColor(newSib.right);
-		this.cmd("Step");
-		this.fixExtraBlackChild(parNode, isLeftChild);
-	}
-	else if (!isLeftChild && this.blackLevel(sibling.left) > 0)
-	{
-		this.cmd("SetText", 0, "Double black node has black sibling, but double black node is a right child, \nand the left nephew is black.  Rotate tree to make opposite nephew red ...");
-		this.cmd("Step");
-		newSib = this.singleRotateLeft(sibling);
-		newSib.blackLevel = 1;
-		this.fixNodeColor(newSib);
-		newSib.left.blackLevel = 0;
-		this.fixNodeColor(newSib.left);
-		this.cmd("Step");
-		this.fixExtraBlackChild(parNode, isLeftChild);
-	}
-	else if (isLeftChild)
-	{
-		this.cmd("SetText", 0, "Double black node has black sibling, is a left child, and its right nephew is red.\nOne rotation can fix double-blackness.");
-		this.cmd("Step");
-		
-		var oldParBlackLevel  = parNode.blackLevel;
-		newPar = this.singleRotateLeft(parNode);
-		if (oldParBlackLevel == 0)
-		{
-			newPar.blackLevel = 0;
-			this.fixNodeColor(newPar);
-			newPar.left.blackLevel = 1;
-			this.fixNodeColor(newPar.left);
-		}
-		newPar.right.blackLevel = 1;
-		this.fixNodeColor(newPar.right);
-		if (newPar.left.left != null)
-		{
-			newPar.left.left.blackLevel = 1;
-			this.fixNodeColor(newPar.left.left);
-		}
-	}
-	else
-	{
-		this.cmd("SetText", 0, "Double black node has black sibling, is a right child, and its left nephew is red.\nOne rotation can fix double-blackness.");
-		this.cmd("Step");
-		
-		oldParBlackLevel  = parNode.blackLevel;
-		newPar = this.singleRotateRight(parNode);
-		if (oldParBlackLevel == 0)
-		{
-			newPar.blackLevel = 0;
-			this.fixNodeColor(newPar);
-			newPar.right.blackLevel = 1;
-			this.fixNodeColor(newPar.right);
-		}
-		newPar.left.blackLevel = 1;
-		this.fixNodeColor(newPar.left);
-		if (newPar.right.right != null)
-		{
-			newPar.right.right.blackLevel = 1;
-			this.fixNodeColor(newPar.right.right);
-		}
+		this.treeRoot.blackLevel = 1;
+		this.fixNodeColor(this.treeRoot);
 	}
 }
 
-
-RedBlack.prototype.fixExtraBlack = function(tree)
+RedBlack.prototype._treeDelete = function(tree, valueToDelete, foundAlready)
 {
-	if (tree.blackLevel > 1)
+	if (!this.treeRoot)
 	{
-		if (tree.parent == null)
-		{
-			this.cmd("SetText", 0, "Double black node is root.  Make it single black.");
-			this.cmd("Step");
-			
-			tree.blackLevel = 1;
-			this.cmd("SetBackgroundColor", tree.graphicID, BACKGROUND_BLACK);
-		}
-		else if (tree.parent.left == tree)
-		{
-			this.fixExtraBlackChild(tree.parent, true);
-		}
-		else
-		{
-			this.fixExtraBlackChild(tree.parent, false);					
-		}
-		
+		this.cmd("SetText", 0, "Element "+valueToDelete+" not found, could not delete");
+		this.cmd("Step");
+		return null;
 	}
-	else 
+
+	if (!foundAlready && valueToDelete !== tree.data)
 	{
-		// No extra blackness
-	}
-}
-
-
-
-RedBlack.prototype.treeDelete = function(tree, valueToDelete)
-{
-	var leftchild = false;
-	if (tree != null && !tree.phantomLeaf)
-	{
-		if (tree.parent != null)
-		{
-			leftchild = tree.parent.left == tree;
-		}
 		this.cmd("SetHighlight", tree.graphicID, 1);
 		if (valueToDelete < tree.data)
 		{	
 			this.cmd("SetText", 0, valueToDelete + " < " + tree.data + ".  Looking at left subtree");				
 		}
-		else if (valueToDelete > tree.data)
+		else
 		{
 			this.cmd("SetText", 0, valueToDelete + " > " + tree.data + ".  Looking at right subtree");				
 		}
-		else
-		{
-			this.cmd("SetText", 0, valueToDelete + " == " + tree.data + ".  Found node to delete");									
-		}
 		this.cmd("Step");
 		this.cmd("SetHighlight", tree.graphicID, 0);
-		
-		if (valueToDelete == tree.data)
+	}
+
+	var result;
+	if (valueToDelete < tree.data)
+	{
+		if (this.blackLevel(tree.left) && this.blackLevel(tree.left.left))
 		{
-			var needFix = tree.blackLevel > 0;
-			if (((tree.left == null) || tree.left.phantomLeaf)  && ((tree.right == null) || tree.right.phantomLeaf))
+			// move red to left
+			this.cmd("SetText", 0, "Begin move red link to left");
+			this.flipColors(tree);
+			if (!this.blackLevel(tree.right.left))
 			{
-				this.cmd("SetText",  0, "Node to delete is a leaf.  Delete it.");
-				this.cmd("Delete", tree.graphicID);
-				
-				if (tree.left != null)
-				{
-					this.cmd("Delete", tree.left.graphicID);
-				}
-				if (tree.right != null)
-				{
-					this.cmd("Delete", tree.right.graphicID);
-				}
-				
-				
-				if (leftchild && tree.parent != null)
-				{
-					tree.parent.left = null;
-					this.resizeTree();				
-					
-					if (needFix)
-					{
-						this.fixLeftNull(tree.parent);
-					}
-					else
-					{
-						
-						this.attachLeftNullLeaf(tree.parent);
-						this.resizeTree();
-					}
-				}
-				else if (tree.parent != null)
-				{
-					tree.parent.right = null;
-					this.resizeTree();		
-					if (needFix)
-					{
-						this.fixRightNull(tree.parent);
-					}
-					else
-					{
-						this.attachRightNullLeaf(tree.parent);
-						this.resizeTree();
-					}
-				}
-				else
-				{
-					this.treeRoot = null;
-				}
-				
+				tree.right = this.singleRotateRight(tree.right);
+				tree = this.singleRotateLeft(tree);
+				this.flipColors(tree);
 			}
-			else if (tree.left == null || tree.left.phantomLeaf)
+			this.cmd("SetText", 0, "End move red link to left");
+			this.cmd("Step");
+		}
+
+		if (tree.left && !tree.left.phantomLeaf)
+		{
+			this.cmd("CreateHighlightCircle", this.highlightID, HIGHLIGHT_COLOR, tree.x, tree.y);
+			this.cmd("Move", this.highlightID, tree.left.x, tree.left.y);
+			this.cmd("Step");
+			this.cmd("Delete", this.highlightID);
+			result = this._treeDelete(tree.left, valueToDelete, foundAlready);
+			tree.left = result;
+			if (!result)
 			{
-				this.cmd("SetText", 0, "Node to delete has no left child.  \nSet parent of deleted node to right child of deleted node.");									
-				if (tree.left != null)
-				{
-					this.cmd("Delete", tree.left.graphicID);
-					tree.left = null;
-				}
-				
-				if (tree.parent != null)
-				{
-					this.cmd("Disconnect", tree.parent.graphicID, tree.graphicID);
-					this.cmd("Connect", tree.parent.graphicID, tree.right.graphicID, LINK_COLOR);
-					this.cmd("Step");
-					this.cmd("Delete", tree.graphicID);
-					if (leftchild)
-					{
-						tree.parent.left = tree.right;
-						if (needFix)
-						{
-							this.cmd("SetText", 0, "Back node removed.  Increasing child's blackness level");
-							tree.parent.left.blackLevel++;
-							this.fixNodeColor(tree.parent.left);
-							this.fixExtraBlack(tree.parent.left);
-						}
-					}
-					else
-					{
-						tree.parent.right = tree.right;
-						if (needFix)
-						{
-							tree.parent.right.blackLevel++;
-							this.cmd("SetText", 0, "Back node removed.  Increasing child's blackness level");
-							this.fixNodeColor(tree.parent.right);
-							this.fixExtraBlack(tree.parent.right);
-						}
-						
-					}
-					tree.right.parent = tree.parent;
-				}
-				else
-				{
-					this.cmd("Delete", tree.graphicID);
-					this.treeRoot = tree.right;
-					this.treeRoot.parent = null;
-					if (this.treeRoot.blackLevel == 0)
-					{
-						this.treeRoot.blackLevel = 1;
-						this.cmd("SetForegroundColor", this.treeRoot.graphicID, FOREGROUND_BLACK);
-						this.cmd("SetBackgroundColor", this.treeRoot.graphicID, BACKGROUND_BLACK);		
-					}
-				}
+				this.attachLeftNullLeaf(tree);
 				this.resizeTree();
+				result = tree.left;
 			}
-			else if (tree.right == null || tree.right.phantomLeaf)
+			result.parent = tree;
+		}
+		else
+		{
+			this.cmd("SetText", 0, "Element "+valueToDelete+" not found, could not delete");
+			this.cmd("Step");
+		}
+	}
+	else
+	{
+		if (!this.blackLevel(tree.left))
+		{
+			this.cmd("SetText", 0, "Preemptively pass red left link to the right");
+		  	tree = this.singleRotateRight(tree);
+		}
+		if (valueToDelete === tree.data && (!tree.right || tree.right.phantomLeaf))
+		{
+			if (!foundAlready)
 			{
-				this.cmd("SetText",  0,"Node to delete has no right child.  \nSet parent of deleted node to left child of deleted node.");
-				if (tree.right != null)
+				foundAlready = true;
+				this.cmd("SetHighlight", tree.graphicID, 1);
+				this.cmd("SetText", 0, valueToDelete + " == " + tree.data + ".  Found node to delete");	
+				this.cmd("Step");
+				this.cmd("SetHighlight", tree.graphicID, 0);
+			}
+			else
+			{
+				this.cmd("SetHighlight", tree.graphicID, 1);
+				this.cmd("SetText", 0, valueToDelete + " == " + tree.data + ".  Found duplicate successor key to delete");	
+				this.cmd("Step");
+				this.cmd("SetHighlight", tree.graphicID, 0);
+			}
+
+			
+			if (tree.parent)
+			{
+				this.cmd("Disconnect", tree.parent.graphicID, tree.graphicID);
+			}
+			this.cmd("Step");
+			this.cmd("Delete", tree.graphicID);
+			if (tree.left)
+			{
+				// has to be that tree.left.phantomLeaf is true
+				if (!tree.left.phantomLeaf)
 				{
-					this.cmd("Delete", tree.right.graphicID);
-					tree.right = null;					
+					throw new Error("tree.left can only be phantom at this stage");
 				}
-				if (tree.parent != null)
+				this.cmd("Delete", tree.left.graphicID);
+			}
+			if (tree.right)
+			{
+				this.cmd("Delete", tree.right.graphicID);
+			}
+			if (tree == this.treeRoot)
+			{
+				this.treeRoot = null;
+			}
+		  	return null;
+		}
+		else
+		{
+		  	if (this.blackLevel(tree.right) && this.blackLevel(tree.right.left))
+			{
+				// move red to right
+				this.cmd("SetText", 0, "Begin move red link to right");
+				this.flipColors(tree);
+				if (!this.blackLevel(tree.left.left))
 				{
-					this.cmd("Disconnect", tree.parent.graphicID, tree.graphicID);
-					this.cmd("Connect", tree.parent.graphicID, tree.left.graphicID, LINK_COLOR);
+					tree = this.singleRotateRight(tree);
+					this.flipColors(tree);
+				}
+				this.cmd("SetText", 0, "End move red link to right");
+				this.cmd("Step");
+		  	}
+		  	if (valueToDelete === tree.data)
+			{
+				if (!foundAlready)
+				{
+					foundAlready = true;
+					this.cmd("SetHighlight", tree.graphicID, 1);
+					this.cmd("SetText", 0, valueToDelete + " == " + tree.data + ".  Found node to delete");	
 					this.cmd("Step");
-					this.cmd("Delete", tree.graphicID);
-					if (leftchild)
-					{
-						tree.parent.left = tree.left;
-						if (needFix)
-						{
-							tree.parent.left.blackLevel++;
-							this.fixNodeColor(tree.parent.left);
-							this.fixExtraBlack(tree.parent.left);
-							this.resizeTree();
-						}
-						else
-						{
-							this.cmd("SetText", 0, "Deleted node was red.  No tree rotations required.");									
-							this.resizeTree();
-								
-						}
-					}
-					else
-					{
-						tree.parent.right = tree.left;
-						if (needFix)
-						{
-							tree.parent.right.blackLevel++;
-							this.fixNodeColor(tree.parent.right);
-							this.fixExtraBlack(tree.parent.left);
-							this.resizeTree();
-						}
-						else
-						{
-							this.cmd("SetText", 0, "Deleted node was red.  No tree rotations required.");									
-							this.resizeTree();								
-						}
-					}
-					tree.left.parent = tree.parent;
+					this.cmd("SetHighlight", tree.graphicID, 0);
 				}
 				else
 				{
-					this.cmd("Delete" , tree.graphicID);
-					this.treeRoot = tree.left;
-					this.treeRoot.parent = null;
-					if (this.treeRoot.blackLevel == 0)
-					{
-						this.treeRoot.blackLevel = 1;
-						this.fixNodeColor(this.treeRoot);
-					}
+					this.cmd("SetHighlight", tree.graphicID, 1);
+					this.cmd("SetText", 0, valueToDelete + " == " + tree.data + ".  Found duplicate successor key to delete");	
+					this.cmd("Step");
+					this.cmd("SetHighlight", tree.graphicID, 0);
 				}
-			}
-			else // tree.left != null && tree.right != null
-			{
-				this.cmd("SetText", 0, "Node to delete has two childern.  \nFind largest node in left subtree.");									
-				
+
 				this.highlightID = this.nextIndex;
 				this.nextIndex += 1;
 				this.cmd("CreateHighlightCircle", this.highlightID, HIGHLIGHT_COLOR, tree.x, tree.y);
 				var tmp = tree;
-				tmp = tree.left;
+				tmp = tree.right;
 				this.cmd("Move", this.highlightID, tmp.x, tmp.y);
 				this.cmd("Step");																									
-				while (tmp.right != null && !tmp.right.phantomLeaf)
+				while (tmp.left != null && !tmp.left.phantomLeaf)
 				{
-					tmp = tmp.right;
+					tmp = tmp.left;
 					this.cmd("Move", this.highlightID, tmp.x, tmp.y);
 					this.cmd("Step");																									
 				}
-				if (tmp.right != null)
+				if (tmp.left != null)
 				{
-					this.cmd("Delete", tmp.right.graphicID);
-					tmp.right = null;
+					this.cmd("Delete", tmp.left.graphicID);
+					tmp.left = null;
 				}
 				this.cmd("SetText", tree.graphicID, " ");
 				var labelID = this.nextIndex;
@@ -1179,148 +873,48 @@ RedBlack.prototype.treeDelete = function(tree, valueToDelete)
 				this.cmd("SetForegroundColor", labelID, BLUE);
 				tree.data = tmp.data;
 				this.cmd("Move", labelID, tree.x, tree.y);
-				this.cmd("SetText", 0, "Copy largest value of left subtree into node to delete.");									
+				this.cmd("SetText", 0, "Copy smallest value of right subtree into node to delete.");									
 				
 				this.cmd("Step");
 				this.cmd("SetHighlight", tree.graphicID, 0);
 				this.cmd("Delete", labelID);
 				this.cmd("SetText", tree.graphicID, tree.data);
 				this.cmd("Delete", this.highlightID);							
-				this.cmd("SetText", 0, "Remove node whose value we copied.");									
-				
-				needFix = tmp.blackLevel > 0;
-				
-				
-				if (tmp.left == null)
+				this.cmd("SetText", 0, "Remove node whose value we copied.");
+
+				result = this._treeDelete(tree.right, tree.data, foundAlready);
+				tree.right = result;
+				if (!result)
 				{
-					this.cmd("Delete", tmp.graphicID);
-					if (tmp.parent != tree)
+					this.attachRightNullLeaf(tree);
+					this.resizeTree();
+					result = tree.right;
+				}
+				result.parent = tree;
+			}
+			else
+			{
+				if (tree.right && !tree.right.phantomLeaf)
+				{
+					result = this._treeDelete(tree.right, valueToDelete, foundAlready);	
+					tree.right = result;
+					if (!result)
 					{
-						tmp.parent.right = null;
+						this.attachRightNullLeaf(tree);
 						this.resizeTree();
-						if (needFix)
-						{
-							this.fixRightNull(tmp.parent);
-						}
-						else
-						{
-							this.cmd("SetText", 0, "Deleted node was red.  No tree rotations required.");									
-							this.cmd("Step");									
-						}
+						result = tree.right;
 					}
-					else
-					{
-						tree.left = null;
-						this.resizeTree();
-						if (needFix)
-						{
-							this.fixLeftNull(tmp.parent);
-						}
-						else
-						{
-							this.cmd("SetText", 0, "Deleted node was red.  No tree rotations required.");									
-							this.cmd("Step");									
-						}
-					}
+					result.parent = tree;
 				}
 				else
 				{
-					this.cmd("Disconnect", tmp.parent.graphicID, tmp.graphicID);
-					this.cmd("Connect", tmp.parent.graphicID, tmp.left.graphicID, LINK_COLOR);
+					this.cmd("SetText", 0, "Element "+valueToDelete+" not found, could not delete");
 					this.cmd("Step");
-					this.cmd("Delete", tmp.graphicID);
-					
-					if (tmp.parent != tree)
-					{
-						tmp.parent.right = tmp.left; 
-						tmp.left.parent = tmp.parent;
-						this.resizeTree();
-						
-						if (needFix)
-						{
-							this.cmd("SetText", 0, "Coloring child of deleted node black");
-							this.cmd("Step");
-							tmp.left.blackLevel++;
-							if (tmp.left.phantomLeaf)
-							{
-								this.cmd("SetLayer", tmp.left.graphicID, 0);
-							}
-							this.fixNodeColor(tmp.left);
-							this.fixExtraBlack(tmp.left);
-							if (tmp.left.phantomLeaf)
-							{
-								this.cmd("SetLayer", tmp.left.graphicID, 1);
-							}
-							
-						}
-						else
-						{
-							this.cmd("SetText", 0, "Deleted node was red.  No tree rotations required.");									
-							this.cmd("Step");									
-						}
-					}
-					else
-					{
-						tree.left = tmp.left;
-						tmp.left.parent = tree;
-						this.resizeTree();
-						if (needFix)
-						{
-							this.cmd("SetText", 0, "Coloring child of deleted node black");
-							this.cmd("Step");
-							tmp.left.blackLevel++;
-							if (tmp.left.phantomLeaf)
-							{
-								this.cmd("SetLayer", tmp.left.graphicID, 0);
-							}
-							
-							this.fixNodeColor(tmp.left);
-							this.fixExtraBlack(tmp.left);
-							if (tmp.left.phantomLeaf)
-							{
-								this.cmd("SetLayer", tmp.left.graphicID, 1);
-							}
-							
-						}
-						else
-						{
-							this.cmd("SetText", 0, "Deleted node was red.  No tree rotations required.");									
-							this.cmd("Step");									
-						}
-					}
 				}
-				tmp = tmp.parent;
-				
 			}
-		}
-		else if (valueToDelete < tree.data)
-		{
-			if (tree.left != null)
-			{
-				this.cmd("CreateHighlightCircle", this.highlightID, HIGHLIGHT_COLOR, tree.x, tree.y);
-				this.cmd("Move", this.highlightID, tree.left.x, tree.left.y);
-				this.cmd("Step");
-				this.cmd("Delete", this.highlightID);
-			}
-			this.treeDelete(tree.left, valueToDelete);
-		}
-		else
-		{
-			if (tree.right != null)
-			{
-				this.cmd("CreateHighlightCircle", this.highlightID, HIGHLIGHT_COLOR, tree.x, tree.y);
-				this.cmd("Move", this.highlightID, tree.right.x, tree.right.y);
-				this.cmd("Step");
-				this.cmd("Delete", this.highlightID);
-			}
-			this.treeDelete(tree.right, valueToDelete);					
 		}
 	}
-	else
-	{
-		this.cmd("SetText", 0, "Elemet "+valueToDelete+" not found, could not delete");
-	}
-	
+	return this.fixUp(tree);
 }
 
 
