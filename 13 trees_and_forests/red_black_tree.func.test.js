@@ -21,9 +21,14 @@ const removeFromH = (v) => {
   h = remove(h, v);
 };
 
-console.log("Find in empty?", find(h, 22));
+console.log("Find 22 in empty?", find(h, 22));
 
 addToH(4);
+
+console.log("Removing non-existent key 22 from singleton?");
+removeFromH(22);
+print(h);
+
 addToH(9);
 addToH(11);
 addToH(12);

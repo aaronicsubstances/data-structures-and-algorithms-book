@@ -52,7 +52,7 @@ const _rotate = (tree, side) => {
 };
 
 const _fixUp = (tree) => {
-  if (_isRed(tree.right)) {
+  if (_isRed(tree.right) && !_isRed(tree.left)) {
     tree = _rotate(tree, "right");
   }
 
@@ -87,7 +87,7 @@ const _remove = (tree, keyToRemove) => {
   if (isEmpty(tree)) {
     return null;
   } else if (keyToRemove < tree.key) {
-    if (_isBlack(tree.left) && _isBlack(tree.left.left)) {
+    if (tree.left && _isBlack(tree.left) && _isBlack(tree.left.left)) {
       // move red to left
       _flipColors(tree);
       if (_isRed(tree.right.left)) {
@@ -104,7 +104,7 @@ const _remove = (tree, keyToRemove) => {
     if (keyToRemove === tree.key && isEmpty(tree.right)) {
       return null;
     } else {
-      if (_isBlack(tree.right) && _isBlack(tree.right.left)) {
+      if (tree.right && _isBlack(tree.right) && _isBlack(tree.right.left)) {
         // move red to right
         _flipColors(tree);
         if (_isRed(tree.left.left)) {
@@ -124,6 +124,9 @@ const _remove = (tree, keyToRemove) => {
 };
 
 const remove = (tree, keyToRemove) => {
+  if (!isEmpty(tree) && _isBlack(tree.left)) {
+    tree.color = RED;
+  }
   const newRoot = _remove(tree, keyToRemove);
   if (!isEmpty(newRoot)) {
     newRoot.color = BLACK;

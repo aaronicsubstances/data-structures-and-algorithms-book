@@ -380,7 +380,7 @@ RedBlack.prototype.insertElement = function(insertedValue)
 		
 		this.cmd("SetHighlight", insertElem.graphicID, 1);
 		insertElem.height = 1;
-		this.insert(insertElem, this.treeRoot);
+		this.insert(insertElem);
 		//				resizeTree();				
 	}
 	this.cmd("SetText", 0, " ");				
@@ -562,9 +562,9 @@ RedBlack.prototype.resetHeight = function(tree)
 	}
 }
 
-RedBlack.prototype.insert = function(elem, tree)
+RedBlack.prototype.insert = function(elem)
 {
-	this._insert(elem, tree);
+	this._insert(elem, this.treeRoot);
 
 	if (this.treeRoot.blackLevel == 0)
 	{
@@ -593,7 +593,6 @@ RedBlack.prototype._insert = function(elem, tree)
 	this.cmd("SetHighlight", tree.graphicID , 0);
 	this.cmd("SetHighlight", elem.graphicID, 0);
 	
-	var result;
 	if (elem.data < tree.data)
 	{
 		if (tree.left == null || tree.left.phantomLeaf)
@@ -619,14 +618,13 @@ RedBlack.prototype._insert = function(elem, tree)
 			this.cmd("Move", this.highlightID, tree.left.x, tree.left.y);
 			this.cmd("Step");
 			this.cmd("Delete", this.highlightID);
-			result = this._insert(elem, tree.left);
-			tree.left = result;
-			result.parent = tree;
+			tree.left = this._insert(elem, tree.left);
+			tree.left.parent = tree;
 		}
 	}
 	else
 	{
-		if (tree.right == null  || tree.right.phantomLeaf)
+		if (tree.right == null || tree.right.phantomLeaf)
 		{
 			this.cmd("SetText",  0, "Found null tree (or phantom leaf), inserting element");
 			if (tree.right != null)
@@ -635,7 +633,7 @@ RedBlack.prototype._insert = function(elem, tree)
 			}
 			
 			this.cmd("SetHighlight", elem.graphicID, 0);
-			tree.right=elem;
+			tree.right = elem;
 			elem.parent = tree;
 			this.cmd("Connect", tree.graphicID, elem.graphicID, LINK_COLOR);
 			elem.x = tree.x + widthDelta/2;
@@ -654,9 +652,8 @@ RedBlack.prototype._insert = function(elem, tree)
 			this.cmd("Move", this.highlightID, tree.right.x, tree.right.y);
 			this.cmd("Step");
 			this.cmd("Delete", this.highlightID);
-			result = this._insert(elem, tree.right);
-			tree.right = result;
-			result.parent = tree;
+			tree.right = this._insert(elem, tree.right);
+			tree.right.parent = tree;
 		}
 	}
 	
@@ -671,24 +668,24 @@ RedBlack.prototype.deleteElement = function(deletedValue)
 	this.cmd("Step");
 	this.cmd("SetText", 0, " ");
 	this.highlightID = this.nextIndex++;
-	this.treeDelete(this.treeRoot, deletedValue);
+	this.treeDelete(deletedValue);
 	this.cmd("SetText", 0, " ");			
 	// Do delete
 	return this.commands;						
 }
 
-RedBlack.prototype.treeDelete = function(tree, deletedValue)
+RedBlack.prototype.treeDelete = function(deletedValue)
 {
-	if (tree && this.blackLevel(tree.left) && this.blackLevel(tree.right))
+	if (this.treeRoot && this.blackLevel(this.treeRoot.left))
 	{
-		this.cmd("SetText", 0, "Both children of root are black. Color root red");
+		this.cmd("SetText", 0, "Invariant of red root or red left child not in place. Color root red");
 		this.cmd("Step");
 
-		tree.blackLevel = 0;
-		this.fixNodeColor(tree);
+		this.treeRoot.blackLevel = 0;
+		this.fixNodeColor(this.treeRoot);
 	}
 
-	this._treeDelete(tree, deletedValue);
+	this._treeDelete(this.treeRoot, deletedValue);
 
 	if (this.treeRoot && this.treeRoot.blackLevel == 0)
 	{
@@ -702,7 +699,7 @@ RedBlack.prototype.treeDelete = function(tree, deletedValue)
 
 RedBlack.prototype._treeDelete = function(tree, valueToDelete, foundAlready)
 {
-	if (!this.treeRoot)
+	if (!tree || tree.phantomLeaf)
 	{
 		this.cmd("SetText", 0, "Element "+valueToDelete+" not found, could not delete");
 		this.cmd("Step");
@@ -713,7 +710,7 @@ RedBlack.prototype._treeDelete = function(tree, valueToDelete, foundAlready)
 	{
 		this.cmd("SetHighlight", tree.graphicID, 1);
 		if (valueToDelete < tree.data)
-		{	
+		{
 			this.cmd("SetText", 0, valueToDelete + " < " + tree.data + ".  Looking at left subtree");				
 		}
 		else
@@ -724,10 +721,10 @@ RedBlack.prototype._treeDelete = function(tree, valueToDelete, foundAlready)
 		this.cmd("SetHighlight", tree.graphicID, 0);
 	}
 
-	var result;
 	if (valueToDelete < tree.data)
 	{
-		if (this.blackLevel(tree.left) && this.blackLevel(tree.left.left))
+		if ((tree.left && !tree.left.phantomLeaf) && this.blackLevel(tree.left)
+			&& this.blackLevel(tree.left.left))
 		{
 			// move red to left
 			this.cmd("SetText", 0, "Begin move red link to left");
@@ -748,15 +745,13 @@ RedBlack.prototype._treeDelete = function(tree, valueToDelete, foundAlready)
 			this.cmd("Move", this.highlightID, tree.left.x, tree.left.y);
 			this.cmd("Step");
 			this.cmd("Delete", this.highlightID);
-			result = this._treeDelete(tree.left, valueToDelete, foundAlready);
-			tree.left = result;
-			if (!result)
+			tree.left = this._treeDelete(tree.left, valueToDelete, foundAlready);
+			if (!tree.left)
 			{
 				this.attachLeftNullLeaf(tree);
 				this.resizeTree();
-				result = tree.left;
 			}
-			result.parent = tree;
+			tree.left.parent = tree;
 		}
 		else
 		{
@@ -817,7 +812,8 @@ RedBlack.prototype._treeDelete = function(tree, valueToDelete, foundAlready)
 		}
 		else
 		{
-		  	if (this.blackLevel(tree.right) && this.blackLevel(tree.right.left))
+		  	if ((tree.right && !tree.right.phantomLeaf) && this.blackLevel(tree.right)
+				&& this.blackLevel(tree.right.left))
 			{
 				// move red to right
 				this.cmd("SetText", 0, "Begin move red link to right");
@@ -882,29 +878,29 @@ RedBlack.prototype._treeDelete = function(tree, valueToDelete, foundAlready)
 				this.cmd("Delete", this.highlightID);							
 				this.cmd("SetText", 0, "Remove node whose value we copied.");
 
-				result = this._treeDelete(tree.right, tree.data, foundAlready);
-				tree.right = result;
-				if (!result)
+				tree.right = this._treeDelete(tree.right, tree.data, foundAlready);
+				if (!tree.right)
 				{
 					this.attachRightNullLeaf(tree);
 					this.resizeTree();
-					result = tree.right;
 				}
-				result.parent = tree;
+				tree.right.parent = tree;
 			}
 			else
 			{
 				if (tree.right && !tree.right.phantomLeaf)
 				{
-					result = this._treeDelete(tree.right, valueToDelete, foundAlready);	
-					tree.right = result;
-					if (!result)
+					this.cmd("CreateHighlightCircle", this.highlightID, HIGHLIGHT_COLOR, tree.x, tree.y);
+					this.cmd("Move", this.highlightID, tree.right.x, tree.right.y);
+					this.cmd("Step");
+					this.cmd("Delete", this.highlightID);
+					tree.right = this._treeDelete(tree.right, valueToDelete, foundAlready);
+					if (!tree.right)
 					{
 						this.attachRightNullLeaf(tree);
 						this.resizeTree();
-						result = tree.right;
 					}
-					result.parent = tree;
+					tree.right.parent = tree;
 				}
 				else
 				{
@@ -928,14 +924,7 @@ RedBlack.prototype.fixNodeColor = function(tree)
 	else
 	{
 		this.cmd("SetForegroundColor", tree.graphicID, FOREGROUND_BLACK);
-		if (tree.blackLevel > 1)
-		{
-			this.cmd("SetBackgroundColor",tree.graphicID, BACKGROUND_DOUBLE_BLACK);			
-		}
-		else
-		{
-			this.cmd("SetBackgroundColor",tree.graphicID, BACKGROUND_BLACK);
-		}
+		this.cmd("SetBackgroundColor",tree.graphicID, BACKGROUND_BLACK);
 	}
 }
 

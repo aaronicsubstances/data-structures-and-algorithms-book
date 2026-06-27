@@ -29,3 +29,12 @@ decompress the code to use "left" and "right", before I understood what
 the code section.
 
 Figure 12.45 - parent of 12 should be 23, not 9
+
+Chapter 13
+Removing a Key from a Red-Black Tree
+- The statement "Remember the invariant to uphold: either the root or its left child
+must be black." should rather read "Remember the invariant to uphold: either the root
+or its left child must be red."
+- The JS code omits the containsKey() check in Sedgewick's Java code. And so
+it creates null errors when removing non-existent keys, unless there are explicit
+checks for nulls in the if conditions for black colors.
