@@ -199,3 +199,24 @@ the find routine ensures the existence of the key in the tree. The JS code omits
 this check, but then has to add extra null checks to avoid errors when 
 determining black colours of null leaves, during the removal process of
 non-existent keys.
+
+Chapter 14
+
+A heap is a tree data structure that maintains the heap property that a
+parent's key is not less than (not greater in the case of min-heaps)
+those of its children.
+It can be binary (default) or d-ary where d refers to maximum number of
+children per node, and it can also be max-heap (default) or min-heap.
+
+It was discovered as a side-effect of the invention of the heapsort algorithm in
+the 1960s. In there, the list was the input to sort, and so
+heaps based on lists have to obey the extra structure property, which 
+is that the tree is a complete tree and the nodes for each tree level appear
+in consecutive order in a list.
+
+Later a merger of binary search tree and heap was invented known as treap.
+Treap was actually a precursor to randomized BST meant to use statically
+assigned random priorities to ensure tree balance on the average.
+
+From exercise 14.13, Floyd's heapify algorithm can be used to solve the order 
+statistics problem from Chapter 8, if k << n, ie if k is much less than n.

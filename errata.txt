@@ -38,3 +38,17 @@ or its left child must be red."
 - The JS code omits the containsKey() check in Sedgewick's Java code. And so
 it creates null errors when removing non-existent keys, unless there are explicit
 checks for nulls in the if conditions for black colors.
+
+Chapter 14
+- The statement "The parent of node 2 is at position Math.floor((2-1)/2)=1."
+should rather read "The parent of node 2 is at position Math.floor((2-1)/2)=0."
+
+exercise 14.7 - probably needs clarification of "remove by index".
+
+exercise 14.15 - the answer there looks incorrect. Rather the answer should be:
+same as split of Randomized BST
+
+exercise 14.16 - the answer there looks incorrect. Rather the answer should be:
+same as join of Randomized BST, except that instead of generating a new random 
+number to determine which node to pick, rather use the existing precomputed
+random priorities to determine which node to pick.
