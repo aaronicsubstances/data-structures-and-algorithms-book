@@ -220,3 +220,33 @@ assigned random priorities to ensure tree balance on the average.
 
 From exercise 14.13, Floyd's heapify algorithm can be used to solve the order 
 statistics problem from Chapter 8, if k << n, ie if k is much less than n.
+
+Chapter 15
+
+Chapter is about extension of heaps based on trees and forests introduced in
+chapter 12 and 13, which support two extra operations:
+1. joining two heaps in running time of O(log n) instead of O(n) if using
+Floyd's heapify algorithm. Such heaps are said to be "meldable heaps".
+2. support decreaseKey operations for graph algorithms, generalized as changeKey in
+the book. Such decreaseKey operations requires a key to have an address,
+which is basically the node the key is stored with.
+So these extended heaps are said to be "addressable heaps", unlike 
+heaps based on static arrays. The node with a key is passed to decreaseKey as
+argument. decreaseKey operation usually is the only operation which requires
+an extended heap implementation to add "up" or "parent" fields to their nodes. 
+
+The extended heap implementations are
+- Skew heap
+- Binomial heap or Binomial queue
+- Lazy binomial heap
+- Fibonacci heap - quite complex, by making use of circular doubly linked lists in addition
+to lazy binomial heap. Goal is to reduce decreaseKey's amortised running time
+from O(log n) to O(1).
+- Pairing heap - simplification of Fibonacci heap
+
+Chapter 16
+
+Digital search tree implementations
+-trie or prefix tree
+-radix tree or compact trie
+-ternary trie

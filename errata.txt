@@ -52,3 +52,13 @@ exercise 14.16 - the answer there looks incorrect. Rather the answer should be:
 same as join of Randomized BST, except that instead of generating a new random 
 number to determine which node to pick, rather use the existing precomputed
 random priorities to determine which node to pick.
+
+Chapter 15
+
+exercise 15.2 - solution says "when inserting keys in descending order ... you
+get a badly shaped heap. ... And if you insert them in ascending order, you
+can achieve a full binary tree." But that is for min-heap, not max-heap.
+So for max-heap, which is the default kind of heap in the book,
+the solution should rather read: "when inserting keys in ascending order ... you
+get a badly shaped heap. ... And if you insert them in descending order, you
+can achieve a full binary tree."
