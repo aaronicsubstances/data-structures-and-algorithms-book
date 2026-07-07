@@ -236,13 +236,30 @@ argument. decreaseKey operation usually is the only operation which requires
 an extended heap implementation to add "up" or "parent" fields to their nodes. 
 
 The extended heap implementations are
-- Skew heap
-- Binomial heap or Binomial queue
-- Lazy binomial heap
-- Fibonacci heap - quite complex, by making use of circular doubly linked lists in addition
-to lazy binomial heap. Goal is to reduce decreaseKey's amortised running time
-from O(log n) to O(1).
-- Pairing heap - simplification of Fibonacci heap
+- Skew heap - amortized O(log n) for add, remove, and decreaseKey operations,
+and O(1) for top()
+- Binomial heap or Binomial queue - worst case of O(log n) for add, remove, decreaseKey
+and top.
+- Lazy binomial heap - makes worst case of O(1) for add and top, but at cost of 
+amortized O(log n) for remove rather than worst case O(log n). 
+- Fibonacci heap - modifies lazy binomial heap to use
+circular doubly linked lists in place of left child-right sibling representation of
+a node's children. Goal is to reduce running time
+of decreaseKey from worst case of O(log n) to amortised O(1). And it does this, by
+doing what first step of what decreaseKey of skew heap does: separate the node,
+and add it to the forest of heap-ordered binomial trees.
+Except that mark the parent as having lost a child,
+and next time it has to lose another child, recursively separate the parent too and
+unmark it if marked. The analysis of decreaseKey's running time depends on Fibonacci
+sequence.
+- Pairing heap - simplification of Fibonacci heap. It leverages ideas from skew heap,
+binomial heaps and Fibonacci heaps. It is a multiway ordered forest,
+based on left-child right-sibling representation rather than circular list.
+Its decreaseKey uses skew heap's kind of implementation, but optimizes the need to
+separate if the new key isn't higher than the parent.
+Its remove however, does not calls the merge of binomial heap directly. Rather it
+calls it two at a time through a mergeByPairs helper function, hence the name of
+the data structure is pairng heap.
 
 Chapter 16
 
