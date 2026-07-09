@@ -218,8 +218,13 @@ Later a merger of binary search tree and heap was invented known as treap.
 Treap was actually a precursor to randomized BST meant to use statically
 assigned random priorities to ensure tree balance on the average.
 
+Note that what the book calls "remove" is extractMin in min heaps and
+extractMax in max heaps. And what the books calls top() is min() in min heaps
+nad max() in max heaps.
+
 From exercise 14.13, Floyd's heapify algorithm can be used to solve the order 
 statistics problem from Chapter 8, if k << n, ie if k is much less than n.
+
 
 Chapter 15
 
@@ -232,38 +237,51 @@ the book. Such decreaseKey operations requires a key to have an address,
 which is basically the node the key is stored with.
 So these extended heaps are said to be "addressable heaps", unlike 
 heaps based on static arrays. The node with a key is passed to decreaseKey as
-argument. decreaseKey operation usually is the only operation which requires
+argument. decreaseKey operation is usually the only operation which requires
 an extended heap implementation to add "up" or "parent" fields to their nodes. 
 
+Note that what the book calls "remove" is extractMin in min heaps and
+extractMax in max heaps. And what the books calls top() is min() in min heaps
+nad max() in max heaps.
+
 The extended heap implementations are
-- Skew heap - amortized O(log n) for add, remove, and decreaseKey operations,
-and O(1) for top()
-- Binomial heap or Binomial queue - worst case of O(log n) for add, remove, decreaseKey
-and top.
-- Lazy binomial heap - makes worst case of O(1) for add and top, but at cost of 
-amortized O(log n) for remove rather than worst case O(log n). 
-- Fibonacci heap - modifies lazy binomial heap to use
+- Skew heap - amortized O(log n) for add, extractMin, and decreaseKey operations,
+and O(1) for min().
+- Binomial heap or Binomial queue - worst case of O(log n) for add, extractMin,
+decreaseKey and min.
+- Lazy binomial heap - makes worst case of O(1) for add and min, but at cost of 
+amortized O(log n) for extractMin rather than worst case O(log n). 
+- Fibonacci heap - modifies lazy binomial heap by requiring the use of
 circular doubly linked lists in place of left child-right sibling representation of
-a node's children. Goal is to reduce running time
-of decreaseKey from worst case of O(log n) to amortised O(1). And it does this, by
-doing what first step of what decreaseKey of skew heap does: separate the node,
-and add it to the forest of heap-ordered binomial trees.
+a node's children, in order to support deleting a node without having to search
+first for its previous node, as would need to be done in a singly linked list,
+in implementing decreaseKey.
+Goal is to reduce running time of decreaseKey from worst case of O(log n) to
+amortised O(1). And it does this, by separating the node, and adding it to
+the forest of heap-ordered binomial trees (resembles a decreaseKey implementation for
+skew heaps).
 Except that mark the parent as having lost a child,
-and next time it has to lose another child, recursively separate the parent too and
-unmark it if marked. The analysis of decreaseKey's running time depends on Fibonacci
-sequence.
-- Pairing heap - simplification of Fibonacci heap. It leverages ideas from skew heap,
-binomial heaps and Fibonacci heaps. It is a multiway ordered forest,
-based on left-child right-sibling representation rather than circular list.
-Its decreaseKey uses skew heap's kind of implementation, but optimizes the need to
-separate if the new key isn't higher than the parent.
-Its remove however, does not calls the merge of binomial heap directly. Rather it
-calls it two at a time through a mergeByPairs helper function, hence the name of
-the data structure is pairng heap.
+and next time it has to lose another child, recursively separate the parent too.
+The analysis of decreaseKey's running time depends on Fibonacci sequence, hence the
+name of the data structure is Fibonacci heap.
+- Pairing heap - simplification of Fibonacci heap which does not care about the order
+or degree of the subtrees.
+It is a multiway heap-ordered tree based on left-child right-sibling representation
+rather than circular list.
+The merge function is like that of merging 2 binomial trees of the same order, where
+one becomes the new child of the other.
+The decreaseKey function is like that in Fibonacci heap, but skips the need to
+separate if the new key isn't smaller than that of the parent's key.
+The extractMin function (called "remove" in the book) calls the merge function
+indirectly, by merging two trees at a time recursively through a mergeByPairs
+helper function, hence the name of the data structure is pairng heap.
 
 Chapter 16
 
 Digital search tree implementations
--trie or prefix tree
--radix tree or compact trie
--ternary trie
+- prefix tree or trie
+- radix tree or compact trie - no node aside the root can have exactly 1 child.
+- ternary search tree or ternary trie - interesting look-alike of binary search
+tree, whose nodes have the usual left and right pointers. They have an
+additional middle pointer for navigating the strings stored in the structure
+one character per middle pointer.

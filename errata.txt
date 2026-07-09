@@ -31,7 +31,7 @@ the code section.
 Figure 12.45 - parent of 12 should be 23, not 9
 
 Chapter 13
-Removing a Key from a Red-Black Tree
+"Removing a Key from a Red-Black Tree"
 - The statement "Remember the invariant to uphold: either the root or its left child
 must be black." should rather read "Remember the invariant to uphold: either the root
 or its left child must be red."
@@ -40,6 +40,7 @@ it creates null errors when removing non-existent keys, unless there are explici
 checks for nulls in the if conditions for black colors.
 
 Chapter 14
+"The Structure Property", under "Binary Heaps"
 - The statement "The parent of node 2 is at position Math.floor((2-1)/2)=1."
 should rather read "The parent of node 2 is at position Math.floor((2-1)/2)=0."
 
@@ -62,3 +63,8 @@ So for max-heap, which is the default kind of heap in the book,
 the solution should rather read: "when inserting keys in ascending order ... you
 get a badly shaped heap. ... And if you insert them in descending order, you
 can achieve a full binary tree."
+
+Chapter 16
+
+16.6 - probably needs clarification that: how should the structures look like when adding
+the word "ALGORITHM" to an empty instance of each of them?
