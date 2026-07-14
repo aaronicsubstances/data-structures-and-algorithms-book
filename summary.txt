@@ -449,3 +449,26 @@ no extractMin call has been made yet, so all p.dist values are at an +Infinity
 distance from an empty set.
 
 
+Chapter 18
+
+Arrays and data structures based on them array-based lists, hash tables and
+array-based heaps are just not amenable to functional programming, ie can
+have an equivalent that respects functional programming constraints and 
+preserves to a good extent the performance of the original.
+
+Linked list is amenable, and so is stack. Queues are amenable with the use of
+a data structure based on two stacks, as was done in exercise 10.12
+
+The way to amenability for linked lists is to duplicate new nodes for the path 
+from the head to an inserted or removed node position, and reuse the tail.
+
+Doubly-linked list, deques and circular lists are not amenable, because in the
+end every node will have to be duplicated.
+
+Binary trees and digital search trees can be made amenable.
+
+Meldable heaps can be made amenable if not dependent on data structures that are
+not amenable, like how Fibonacci heaps depend on circular lists which is not amenable.
+
+The way to amenability for trees is to duplicate new nodes for the path 
+from an inserted or removed node to the root, and reuse the unmodified subtrees.

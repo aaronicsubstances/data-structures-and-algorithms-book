@@ -1,15 +1,15 @@
 https://nostarch.com/download/DataStructuresAlgorithmsJavaScript_p1.pdf
 
-Question 4.9 - should be (2^k) - 1, not 2^(k-1), and should probably be
-described as being for the mathematically inclined as is done in Question 9.4
+exercise 4.9 - should be (2^k) - 1, not 2^(k-1), and should probably be
+described as being for the mathematically inclined as is done in exercise 9.4
 
-Question 5.11 - width link pointing to 11 should be (3) not (2).
+exercise 5.11 - width link pointing to 11 should be (3) not (2).
 And there should be a note that the start sentinel
 also has a width of 1, and it should be shown in the diagram as the node
 storing the width link pointing to 11.
 
 
-Chapter 12: There is a clarification omitted in the code for 
+Chapter 12: There should a clarification in the code for 
 "Adding a key to a Randomized BST" and "Splitting the BST", where
 the newNode call in add() which takes left and right arguments (labelled with a "4"),
 uses right of _split's return for the left and the left of _split's return for
@@ -23,25 +23,24 @@ labelled "1", a new object should be constructed and returned with the
 expected left and right fields.
 
 The chapter's use of "side" and "other" in code sections for "left" and "right"
-helps to avoid if else,
-but I think it sacrifices clarity for brevity. Many times I had to 
-decompress the code to use "left" and "right", before I understood what
-the code section.
+helps to reduce if-else blocks, but I think it sacrifices clarity for brevity.
+Many times I had to decompress the code to use "left" and "right",
+before I understood what the code section means.
 
 Figure 12.45 - parent of 12 should be 23, not 9
 
 Chapter 13
 "Removing a Key from a Red-Black Tree"
-- The statement "Remember the invariant to uphold: either the root or its left child
+page 310 - The statement "Remember the invariant to uphold: either the root or its left child
 must be black." should rather read "Remember the invariant to uphold: either the root
 or its left child must be red."
-- The JS code omits the containsKey() check in Sedgewick's Java code. And so
+page 312 - The JS code omits the containsKey() check in Sedgewick's Java code. And so
 it creates null errors when removing non-existent keys, unless there are explicit
 checks for nulls in the if conditions for black colors.
 
 Chapter 14
 "The Structure Property", under "Binary Heaps"
-- The statement "The parent of node 2 is at position Math.floor((2-1)/2)=1."
+page 319 - The statement "The parent of node 2 is at position Math.floor((2-1)/2)=1."
 should rather read "The parent of node 2 is at position Math.floor((2-1)/2)=0."
 
 exercise 14.7 - probably needs clarification of "remove by index".
@@ -66,7 +65,7 @@ can achieve a full binary tree."
 
 Chapter 16
 
-16.6 - probably needs clarification that: how should the structures look like when adding
+exercise 16.6 - probably needs clarification that: how should the structures look like when adding
 the word "ALGORITHM" to an empty instance of each of them?
 
 Chapter 17
@@ -81,5 +80,9 @@ each independent group of nodes."
 is not implemented by any of the MST algorithms as shown in the book.
 
 exercise 17.8 - probably needs clarification that: can you replace the call to
-Javascript's sort in the implementation Kruskal's algorithm with one of
+Javascript's sort method in the implementation Kruskal's algorithm with one of
 the sort algorithms discussed in this book?
+
+Chapter 18
+
+exercise 18.1 - should refer to figure 18-8, not 18-7.
