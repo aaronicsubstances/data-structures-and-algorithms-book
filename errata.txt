@@ -24,7 +24,7 @@ expected left and right fields.
 
 The chapter's use of "side" and "other" in code sections for "left" and "right"
 helps to avoid if else,
-but I think it sacrifices brevity for clarity. Many times I had to 
+but I think it sacrifices clarity for brevity. Many times I had to 
 decompress the code to use "left" and "right", before I understood what
 the code section.
 
@@ -68,3 +68,18 @@ Chapter 16
 
 16.6 - probably needs clarification that: how should the structures look like when adding
 the word "ALGORITHM" to an empty instance of each of them?
+
+Chapter 17
+
+Bellman-Ford Algorithm
+page 437 - The statement "No more changes are possible." should be preceded with
+"You find a better path to B through E."
+
+Finding a Minimum Spanning Trees (MST)
+page 458 - The statement "If a graph is not connected, we’ll find a forest of trees instead for
+each independent group of nodes." 
+is not implemented by any of the MST algorithms as shown in the book.
+
+exercise 17.8 - probably needs clarification that: can you replace the call to
+Javascript's sort in the implementation Kruskal's algorithm with one of
+the sort algorithms discussed in this book?

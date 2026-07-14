@@ -1,3 +1,22 @@
+Start Pages of Answers To End of Chapter Questions
+ - chapter 2: p487
+ - chapter 3: p489
+ - chapter 4: p491
+ - chapter 5: p492
+ - chapter 6: p494
+ - chapter 7: p498
+ - chapter 8: p502
+ - chapter 9: p507
+ - chapter 10: p510
+ - chapter 11: p516
+ - chapter 12: p518
+ - chapter 13: p528
+ - chapter 14: p530
+ - chapter 15: p536
+ - chapter 16: p539
+ - chapter 17: p540
+ - chapter 18: p544
+
 /**** CHAPTER 6 *****/
 
 // SUMMARY: most important algorithms: insertion sort, merge sort, quick sort, counting sort.
@@ -285,3 +304,148 @@ Digital search tree implementations
 tree, whose nodes have the usual left and right pointers. They have an
 additional middle pointer for navigating the strings stored in the structure
 one character per middle pointer.
+
+Chapter 17
+
+Variants:
+- directed graph vrs undirected graphs
+- weighted graph vrs unweighted graphs
+- multigraph vrs simple graph
+- cyclic or acyclic.
+
+NB: Trees are directed acyclic graphs.
+
+Graphs in this book are all simple graphs, ie no self-loops and at most 1 edge
+in the same direction between a given pair of vertices.
+Weights of weighted graphs in this book are never negative.
+
+Types of representations:
+
+ - adjacency matrix for dense graphs
+ - adjacency list for sparse graphs
+ - adjacency set - basically adjacency list but with linked list or array-based list
+swapped out for some advanced data structure like hash set or tree.
+
+Book uses convention of using adjacency matrices throughout its algorithms,
+for making the algorithms easier to understand, and is fully aware that
+most algorithms are more suitable (and sometimes faster) with the adjacency
+list representation.
+Another convention in the book is the use of 0 value in an adjacency matrix
+at address i,j to indicate that the ith vertex and the jth vertex are not connected. 
+
+Shortest Path Algorithms:
+
+ - Floyd-Warshall algorithm - shortest paths between all possible vertices. more suitable with
+adjacency matrix. O(v^3)
+ - Bellman-Ford algorithm - shortest paths between a vertex and all other vertices. more suitable
+with adjacency list. O(v * e)
+ - Dijkstra's algorithm - shortest paths between a vertex and all other vertices, or
+shortest path between two vertices. more suitable with adjacency list. requires
+an efficient addressable heap implementation. O(v * log v)
+
+Topological Sort Algorithms:
+- Kan's Algorithm - focuses on absence of incoming edges. discovers sort in order.
+more suitable with adjacency list. 
+- Tarjan's algorithm - focuses on absence of outgoing edges. discovers sort in reverse order.
+more suitable with adjacency list. 
+useful also for detecting cycles in graphs.
+
+Detecting connectivity in graphs:
+- algorithm based on a disjoint-set data structure, which is a forest of
+trees used as a JS Set which supports only has() and union() operations.
+Only difference with forest of trees implementation in previous chapters
+on trees is that instead of a parent node storing the pointer
+to its child, here a child node stores the pointer to its parent.
+this data structure is also used in Kruskal's algorithm
+NB: this algorithm can also determine count of connected subgraphs of a grah.
+- kind of depth-first search tree algorithm. more suitable with adjacency list.
+
+Minimum Spannning Trees (MST) Algorithms:
+
+Their input graph parameter must be a weighted undirected graph.
+In the book, the graph parameter also has to be connected for the 
+MST implementations to work. 
+
+- Prim's Algorithms - more suitable with adjacency matrix. Focuses on vertices.
+Makes use of an addressable heap.
+Does not seem to work for disconnected graphs at all unless 
+connected subgraphs are first found and then the algorithm is run on each subgraph.
+
+- Kruskal's Algorithm - more suitable with adjacency list. Focuses on edges. uses
+a disjoint-set data structure used elsewhere for detecting graph connectivity
+as noted above.
+Seems to be capable of being adapted to work directly on a disconnected graph
+by retrieving the multiple spanning trees from the disjoint-set data structure.
+
+
+More Notes for chapter 16
+-------------------------
+
+page 430 - nodes are ordered 1...n in the pseudocode (in code it will be 0 ... n- 1).
+So n = number of nodes, and n = maximum(k)
+
+page 433 - The code snippet "c > 0" means is there an edge?
+
+page 434 - Simulating Bellman-Ford algorithm is easier if adjacency list is assumed
+as the representation. In that case, when positioned at a vertex, only outgoing
+edges are of concern.
+Also because the algorithm is using adjacency matrix, treat the diagram used for
+the simulation as a directed graph by mentally replacing each undirected edge with 
+two directed edges.
+
+page 435 - The statement "Assume that nodes are processed in alphabetical order"
+is better understood by appending
+", so that all outgoing edges for a node appear in sorted order after 
+all outgoing edges of preceding nodes."
+So all outgoing edges of node A appear 
+first, followed by all outgoing edges of node B, then of C, and so on.
+
+page 437 - The statement "No more changes are possible." should be preceded with
+"You find a better path to B through E."
+
+Simulation expectations of Bellman-Ford Algorithm:
+
+initially:
+    dist(F) = 0
+
+1st pass:
+    dist(D) = 3;    pred(D) = F
+    dist(G) = 13;   pred(G) = F
+    dist(C) = 24;   pred(C) = G
+    dist(E) = 23;   pred(E) = G
+
+2nd pass:
+    dist(B) = 33;   pred(B) = C
+    dist(A) = 8;    pred(A) = D
+    dist(E) = 10;   pred(E) = D
+    dist(B) = 16;   pred(B) = E
+
+3rd pass:
+    dist(B) = 12;   pred(B) = A
+
+4th pass: nothing changes - could bail out early here as book says.
+
+5th pass: nothing changes
+
+6th pass: nothing changes. Also the final pass of 7 - 1 = 6, where the 7 is from 
+the count of nodes A to G.
+
+page 443 - The code snippet "if v > 0" means if an edge exists between closest and next.
+
+page 459 - The statement "the closest point to either A or B not yet selected is D",
+means that:
+D is the closest vertex from the union of 
+neighbours of A in previous iteration still not selected with extractMin, ie D,
+and the neighbours of B other than already selected with extractMin, ie C and E.
+
+page 462 - The statement "So the heap points will always have the shortest distance
+from them to the already chosen points."
+means that:
+the loop invariant which exists before the while loop, and is
+maintained by the end of an iteration of the while loop is this:
+for any vertex p in the heap, p.dist is the minimum of the distances between that vertex
+and each of the vertices already selected with extractMin. In the beginning
+no extractMin call has been made yet, so all p.dist values are at an +Infinity
+distance from an empty set.
+
+
