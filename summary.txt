@@ -19,10 +19,11 @@ Start Pages of Answers To End of Chapter Questions
 
 /**** CHAPTER 6 *****/
 
-// SUMMARY: most important algorithms: insertion sort, merge sort, quick sort, counting sort.
+// SUMMARY: most important algorithms: insertion sort, merge sort, quick sort, counting sort,
+// heapsort (heapsort is introduced later in chapter 14 - Heaps).
 // - adaptability and online/offline aspects of sorting
-// - realization that popular programming languages do not use any of these, except as subroutines,
-// but rather use more complex algorithms, to achieve adaptability and stability simultaneously.
+// - realization that popular programming languages do not use any of these directly. Rather they are used as subroutines,
+// by more complex sorting algorithms, to achieve adaptability and stability simultaneously.
 
 /**** CHAPTER 7 *****/
 
@@ -75,13 +76,14 @@ main disadvantage is that it does not maintain any ordering of elements.
 Binary search tree, aks BST: it's all about maintaining the invariant that 
 the keys of all nodes in the left child are less than the parent key,
 and the keys of all nodes in the right child are greater than the parent key.
-To support duplicate keys, less than can be changed to less than or greater than.
+To support duplicate keys, either less than can be changed to less than or equal to,
+or greater than can be changed to greater than or equal to.
 Operation of remove is the same for all balanced BST variants when
 the number of children of the node to be removed is less than 2, because in that
 case an adoption occurs.
 when removing the key of a node with two non-empty children,
 pick math successor of key, ie the minimum key greater than key, from 
-leftmost branch of the right, and set it to the key. You can remove that
+leftmost descendant of the right child of node to be removed, and set it to the key. You can remove that
 node before or after setting its key to the place of the node whose key is to 
 be removed.
 
@@ -167,8 +169,8 @@ helped me to debug my simulations. Apparently, it is a consequence of the rule t
 the paths from the root to a null leaf must be the same for all null leaves.
 
 Another difference between the implementations of left leaning variant and
-regular red-black tree is that, the former doesn't need non-null nodes for
-null leaves and parents, but the latter does.
+regular red-black tree is that, unlike the latter, the former doesn't need non-null nodes for
+null leaves, and the former doesn't need pointers to parents.
 
 The book talks about thinking in terms of coloured links. I only found it helpful,
 when I looked at videos by Sedgewick. So I would have loved a clarification
@@ -179,7 +181,7 @@ The link colouration greatly helped me to understand the reason for the
 change of colours which occur during rotation.
 
 Sedgewick's code (https://algs4.cs.princeton.edu/33balanced/RedBlackBST.java.html)
-also made me see how to use the tree as a symbol table(aka Map in Java and JS),
+also made me see how to use the tree as a symbol table (aka Map in Java and JS),
 and it is simply by storing an additional 'val' field beside the 'key' field.
 It also does not use the JS code's approach of using 'side' and 'otherSide' variables
 to implement actions with 'left' and 'right' orientations in one routine,
@@ -192,11 +194,11 @@ This is actually confirmed by Wikipedia (https://en.wikipedia.org/wiki/Tree_(abs
 Thus Sedgewick's code employs the common definition of height of a node,
 which counts edges of the node's path to the root, so that a 1-node tree will have
 height of zero. And that is in contrast to the other definition
-of height of a nnode which counts nodes in the node's path to the root,
+of height of a node used in the book, which counts nodes in the node's path to the root,
 so that a 1-node tree will have height of one.
 
 I realized that in the Java code by Sedgewick, the _fixUp routine has an additional
-condition for its first if statement, such that it only rotates the left red link
+condition for its first "if" statement, such that it only rotates the left red link
 rightwards if the right link isn't red. That additional condition is missing in the
 JS code. I presume the omission is justified because if a tree's left and right links 
 are all red, even if the JS code initially rotates it to the right, the next if
@@ -225,7 +227,7 @@ A heap is a tree data structure that maintains the heap property that a
 parent's key is not less than (not greater in the case of min-heaps)
 those of its children.
 It can be binary (default) or d-ary where d refers to maximum number of
-children per node, and it can also be max-heap (default) or min-heap.
+children per node, and it can also be max-heap (default in book) or min-heap.
 
 It was discovered as a side-effect of the invention of the heapsort algorithm in
 the 1960s. In there, the list was the input to sort, and so
@@ -251,8 +253,10 @@ Chapter is about extension of heaps based on trees and forests introduced in
 chapter 12 and 13, which support two extra operations:
 1. joining two heaps in running time of O(log n) instead of O(n) if using
 Floyd's heapify algorithm. Such heaps are said to be "meldable heaps".
-2. support decreaseKey operations for graph algorithms, generalized as changeKey in
-the book. Such decreaseKey operations requires a key to have an address,
+2. support decreaseKey operations for graph algorithms
+(notable example being Dijkstra's shortest path algorithm in Chapter 17),
+generalized as changeKey in the book.
+Such decreaseKey operations requires a key to have an address,
 which is basically the node the key is stored with.
 So these extended heaps are said to be "addressable heaps", unlike 
 heaps based on static arrays. The node with a key is passed to decreaseKey as
@@ -347,11 +351,11 @@ Topological Sort Algorithms:
 - Kan's Algorithm - focuses on absence of incoming edges. discovers sort in order.
 more suitable with adjacency list. 
 - Tarjan's algorithm - focuses on absence of outgoing edges. discovers sort in reverse order.
-more suitable with adjacency list. 
-useful also for detecting cycles in graphs.
+more suitable with adjacency list. useful also for detecting cycles in graphs.
 
 Detecting connectivity in graphs:
-- algorithm based on a disjoint-set data structure, which is a forest of
+- algorithm based on a disjoint-set data structure 
+(got the name of the data structure from Algorithms textbook by CLRS), which is a forest of
 trees used as a JS Set which supports only has() and union() operations.
 Only difference with forest of trees implementation in previous chapters
 on trees is that instead of a parent node storing the pointer
@@ -384,7 +388,7 @@ More Notes for chapter 16
 page 430 - nodes are ordered 1...n in the pseudocode (in code it will be 0 ... n- 1).
 So n = number of nodes, and n = maximum(k)
 
-page 433 - The code snippet "c > 0" means is there an edge?
+page 433 - The code snippet "if c > 0" means if an edge exists.
 
 page 434 - Simulating Bellman-Ford algorithm is easier if adjacency list is assumed
 as the representation. In that case, when positioned at a vertex, only outgoing
@@ -451,10 +455,12 @@ distance from an empty set.
 
 Chapter 18
 
-Arrays and data structures based on them array-based lists, hash tables and
-array-based heaps are just not amenable to functional programming, ie can
-have an equivalent that respects functional programming constraints and 
-preserves to a good extent the performance of the original.
+Arrays and data structures based on them, like array-based lists, hash tables and
+array-based heaps, are just not amenable to functional programming in their native form.
+They require duplicating the entire contiguous memory block
+on every update. Theoretically, functional equivalents of traditional array-based data structures
+have been proposed which do not use contiguous memory blocks, but preserve performance.
+But they are extremely complex to design and implement.
 
 Linked list is amenable, and so is stack. Queues are amenable with the use of
 a data structure based on two stacks, as was done in exercise 10.12
@@ -462,13 +468,18 @@ a data structure based on two stacks, as was done in exercise 10.12
 The way to amenability for linked lists is to duplicate new nodes for the path 
 from the head to an inserted or removed node position, and reuse the tail.
 
-Doubly-linked list, deques and circular lists are not amenable, because in the
-end every node will have to be duplicated.
+Doubly-linked list and data structures based on them, like deques and circular lists,
+are just not amenable, in their native form.
+They require duplicating the entire collection of forward and back pointers
+on every update.
+Theoretically, functional equivalents have been proposed for deques which
+preserve performance, but again they are extremely complex to design and implement. 
 
 Binary trees and digital search trees can be made amenable.
 
 Meldable heaps can be made amenable if not dependent on data structures that are
-not amenable, like how Fibonacci heaps depend on circular lists which is not amenable.
+not amenable, like how Fibonacci heaps depend on circular doubly linked lists
+which is not amenable.
 
 The way to amenability for trees is to duplicate new nodes for the path 
 from an inserted or removed node to the root, and reuse the unmodified subtrees.
