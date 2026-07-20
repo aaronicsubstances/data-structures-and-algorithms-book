@@ -1,4 +1,4 @@
-// https://www.youtube.com/watch?v=oBt53YbR9Kk
+// https://www.youtube.com/watch?v=oBt53YbR9Kk&t=17423s
 const allConstruct = (target, wordBank, memo = new Map()) => {
     const table = Array(target.length + 1)
         .fill()

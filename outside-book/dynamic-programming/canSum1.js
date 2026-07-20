@@ -1,4 +1,4 @@
-// https://www.youtube.com/watch?v=oBt53YbR9Kk
+// https://www.youtube.com/watch?v=oBt53YbR9Kk&t=4196s
 const canSum = (targetSum, numbers, memo = {}) => {
     if (targetSum in memo) return memo[targetSum];
     if (targetSum === 0) return true;

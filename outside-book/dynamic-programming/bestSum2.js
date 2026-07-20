@@ -1,4 +1,4 @@
-// https://www.youtube.com/watch?v=oBt53YbR9Kk
+// https://www.youtube.com/watch?v=oBt53YbR9Kk&t=14841s
 const bestSum = (targetSum, numbers) => {
     const table = Array(targetSum  + 1).fill(null);
     table[0] = [];

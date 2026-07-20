@@ -1,3 +1,4 @@
+// https://www.youtube.com/watch?v=oBt53YbR9Kk&t=9516s
 const countConstruct = (target, wordBank, memo = new Map()) => {
     if (memo.has(target)) return memo.get(target);
     if (target === '') return 1;

@@ -1,3 +1,4 @@
+// https://www.youtube.com/watch?v=oBt53YbR9Kk&t=15650s
 const canConstruct = (target, wordBank) => {
     const table = Array(target.length + 1).fill(false);
     table[0] = true;

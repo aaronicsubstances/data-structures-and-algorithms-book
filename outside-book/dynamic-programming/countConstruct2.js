@@ -1,3 +1,4 @@
+// https://www.youtube.com/watch?v=oBt53YbR9Kk&t=16686s
 const countConstruct = (target, wordBank) => {
     const table = Array(target.length + 1).fill(0);
     table[0] = 1;

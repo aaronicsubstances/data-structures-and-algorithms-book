@@ -1,4 +1,4 @@
-// https://www.youtube.com/watch?v=oBt53YbR9Kk
+// https://www.youtube.com/watch?v=oBt53YbR9Kk&t=13079s
 const canSum = (targetSum, numbers) => {
     const table = Array(targetSum + 1).fill(false);
     table[0] = true;
